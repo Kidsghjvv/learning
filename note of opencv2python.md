@@ -39,7 +39,7 @@ pip install pytesseract
 
 新建python项目，注意解释器正确配置应该如下：
 
-![1571710989690](note of opencv2python.assets/1571710989690.png)
+<img src="note of opencv2python.assets/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
 
 #### <span id="head3"> 将照片读入到矩阵中，并显示</span>
 
@@ -170,7 +170,7 @@ array生成任意矩阵，可以作为算子
 m3 = np.array([[1,2,3], [4,5,6], [7,8,9]],np.int32)
 ```
 
-![1571711690470](C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571711690470.png)
+<img src="note of opencv2python.assets/1571711690470-1571720785213.png" alt="1571711690470" style="zoom:150%;" />
 
 
 
@@ -240,7 +240,7 @@ dst1 = cv.bitwise_or(m1, m2)
 dst3 = cv.bitwise_not(m1) #获得负片
 ```
 
-![1571712052313](note of opencv2python.assets/1571712052313.png)
+<img src="note of opencv2python.assets/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
 
 #### <span id="head16"> 调整对比度和亮度</span>
 
@@ -274,7 +274,7 @@ cv.floodFill(copyImg, mask, (30, 30), (0, 255, 255), (100, 100, 100), (50, 50, 5
 cv.imshow("fill_color_demo", copyImg)
 ```
 
-![1571712200414](note of opencv2python.assets/1571712200414.png)
+<img src="note of opencv2python.assets/1571712200414.png" alt="1571712200414" style="zoom:80%;" />
 
 ```python
 def fill_binary():
@@ -292,7 +292,7 @@ cv.imshow("filled binary", image)
 关于算子：元素个数为奇数，总和为0：进行边缘和梯度计算，总和为1进行增强锐化等
 Tips：blurry模糊的，不清楚的，污脏的
 
-![1571712321721](note of opencv2python.assets/1571712321721.png)
+<img src="note of opencv2python.assets/1571712321721.png" alt="1571712321721" style="zoom:80%;" />
 
 ```python
 dst = cv.blur(image, (1, 15)) #均值模糊，模糊只是卷积的表象
