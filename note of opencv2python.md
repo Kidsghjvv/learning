@@ -20,7 +20,7 @@ pip install pytesseract
 
 新建python项目，注意解释器正确配置应该如下：
 
-![1571710989690](C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571710989690.png)
+![1571710989690](note of opencv2python.assets/1571710989690.png)
 
 #### 将照片读入到矩阵中，并显示
 
@@ -171,7 +171,7 @@ print("time = %s ms" % (time * 1000))
 
 思路：转换到HSV空间，再参考下表设置inRange函数的参数(红色设置为第二列较佳)
 
-<img src="C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571711906767.png" alt="1571711906767" style="zoom:150%;" />
+<img src="note of opencv2python.assets/1571711906767.png" alt="1571711906767" style="zoom:150%;" />
 
 ```python
 def extract_object_demo():
@@ -221,7 +221,7 @@ dst1 = cv.bitwise_or(m1, m2)
 dst3 = cv.bitwise_not(m1) #获得负片
 ```
 
-![1571712052313](C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571712052313.png)
+![1571712052313](note of opencv2python.assets/1571712052313.png)
 
 #### 调整对比度和亮度
 
@@ -255,7 +255,7 @@ def fill_color_demo(image):
 cv.imshow("fill_color_demo", copyImg)
 ```
 
-![1571712200414](C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571712200414.png)
+![1571712200414](note of opencv2python.assets/1571712200414.png)
 
 ```python
 def fill_binary():
@@ -273,7 +273,7 @@ def fill_binary():
 关于算子：元素个数为奇数，总和为0：进行边缘和梯度计算，总和为1进行增强锐化等
 Tips：blurry模糊的，不清楚的，污脏的
 
-![1571712321721](C:\Users\闵晨阳1998\AppData\Roaming\Typora\typora-user-images\1571712321721.png)
+![1571712321721](note of opencv2python.assets/1571712321721.png)
 
 ```python
 dst = cv.blur(image, (1, 15)) #均值模糊，模糊只是卷积的表象
