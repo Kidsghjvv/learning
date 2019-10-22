@@ -8,9 +8,9 @@
 
 
 
-### <span id="head1"><span id="head1">Note of Opencv to Python</span></span>
+### Note of Opencv to Python
 
-#### <span id="head2"><span id="head2">Opencv 在Pycharm中的配置</span></span>
+#### Opencv 在Pycharm中的配置
 
 ```python
 pip install opencv-python
@@ -22,7 +22,7 @@ pip install pytesseract
 
 <img src="note of opencv2python.assets/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
 
-#### <span id="head3"><span id="head3"> 将照片读入到矩阵中，并显示</span></span>
+#### 将照片读入到矩阵中，并显示
 
 ```python
 src = cv.imread("D:/IMG_20161227_154705.jpg")
@@ -31,7 +31,7 @@ cv.waitKey(0) 必须要有
 cv.imwrite("D:/result.jpg", gray)
 ```
 
-#### <span id="head4"><span id="head4"> 窗口操作	</span></span>
+#### 窗口操作
 
 ```python
 cv.namedWindow("input", cv.WINDOW_AUTOSIZE) 适应图片大小
@@ -45,7 +45,7 @@ cv.startWindowThread()
 
 在调用cv.startWindowThread();后，即使没有调用waitKey()函数，图片也依然实时刷新。opencv的imshow()函数调用以后，并不立即刷新显示图片，而是等到waitKey()后才会刷新图片显示，所以cv.startWindowThread();是新开一个线程实时刷新图片显示。
 
-#### <span id="head5"><span id="head5"> waitKey函数</span></span>
+#### waitKey函数
 
 1.使用OpenCV的imshow函数显示图片，必须配合waitKey 函数使用，才能将图片显示在windows窗体上。否则，imshow 函数单独使用只能弹出空白窗体，而无法显示图片。
 
@@ -53,7 +53,7 @@ cv.startWindowThread()
 
 3.真正能起到程序暂停的作用的是我们熟悉的Windows API函数Sleep
 
-#### <span id="head6"><span id="head6"> 视频与电脑摄像头输入</span></span>
+#### 视频与电脑摄像头输入
 
 ```python
 def video_demo(): #无输入值
@@ -71,7 +71,7 @@ if c == 27:
 break
 ```
 
-#### <span id="head7"><span id="head7"> 获取图片的信息</span></span>
+#### 获取图片的信息
 
 ```python
 def get_image_info(image):
@@ -84,7 +84,7 @@ pixel_data = np.array(image)  #通过numpy获取像素值
 print(image) 可以直接打印
 ```
 
-#### <span id="head8"><span id="head8"> 色彩空间转换</span></span>
+####  色彩空间转换
 
 ```python
 gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY) #获取灰度图像
@@ -93,7 +93,7 @@ gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 back_rgb = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
 ```
 
-#### <span id="head9"><span id="head9"> Print函数Tips</span></span>
+####  Print函数Tips
 
 ```python
 打印变量值
@@ -102,7 +102,7 @@ print("width : %s, height : %s channels : %s" % (width, height, channels))
 print(image)
 ```
 
-#### <span id="head10"><span id="head10"> 遍历像素点</span></span>
+#### 遍历像素点
 
 ```python
 def access_pixels(image):
@@ -118,7 +118,7 @@ image[row, col, c] = 255 – pv
 cv.imshow("demo", image)
 ```
 
-#### <span id="head11"><span id="head11"> 矩阵操纵（创建一幅图像)</span></span>
+#### 矩阵操纵（创建一幅图像)
 
 ones创建任意维度和元素个数的数组，其元素值均为1
 empty一样，只是它所常见的数组内所有元素均为空
@@ -155,7 +155,7 @@ m3 = np.array([[1,2,3], [4,5,6], [7,8,9]],np.int32)
 
 
 
-#### <span id="head12"><span id="head12"> 获取程序执行时间</span></span>
+####  获取程序执行时间
 
 ```python
 t1 = cv.getTickCount()
@@ -167,7 +167,7 @@ print("time = %s ms" % (time * 1000))
 
 可以通过调用opencv自带的API来减少程序执行时间
 
-#### <span id="head13"><span id="head13"> 提取某颜色对应的像素</span></span>
+####  提取某颜色对应的像素
 
 思路：转换到HSV空间，再参考下表设置inRange函数的参数(红色设置为第二列较佳)
 
@@ -192,7 +192,7 @@ if c == 27:
 break  # escape
 ```
 
-#### <span id="head14"><span id="head14"> 图像通道的合并、分离、单通道操作</span></span>
+####  图像通道的合并、分离、单通道操作
 
 ```python
 b, g, r = cv.split(src)
@@ -206,7 +206,7 @@ h, w = src.shape[0:2] #获取图像的高与宽，0可以不输入
 print(src[30, 30, :]) #打印某位置上的三个像素值
 ```
 
-#### <span id="head15"><span id="head15"> 图像算术运算、逻辑运算</span></span>
+#### 图像算术运算、逻辑运算
 
 ```python
 dst = cv.add(m1, m2) #相加
@@ -223,7 +223,7 @@ dst3 = cv.bitwise_not(m1) #获得负片
 
 <img src="note of opencv2python.assets/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
 
-#### <span id="head16"><span id="head16"> 调整对比度和亮度</span></span>
+####  调整对比度和亮度
 
 ```python
 def contrast_brightness_demo(image, c, b):
@@ -234,7 +234,7 @@ cv.imshow("con_bri_demo", dst)
 像素运算式：dst = src1*alpha + src2*beta + gamma
 ```
 
-#### <span id="head17"><span id="head17"> ROI选择</span></span>
+#### ROI选择
 
 ```python
 face = src[50:250, 100:300] # [height, width]
@@ -244,7 +244,7 @@ src[50:250, 100:300] = backrgb
 cv.imshow("face", src)
 ```
 
-#### <span id="head18"><span id="head18"> 泛洪填充</span></span>
+#### 泛洪填充
 
 ```python
 def fill_color_demo(image):
@@ -268,7 +268,7 @@ cv.floodFill(image, mask, (200, 200), (255, 255, 0), cv.FLOODFILL_MASK_ONLY)#只
 cv.imshow("filled binary", image)
 ```
 
-#### <span id="head19"><span id="head19"> 模糊操作</span></span>
+####  模糊操作
 
 关于算子：元素个数为奇数，总和为0：进行边缘和梯度计算，总和为1进行增强锐化等
 Tips：blurry模糊的，不清楚的，污脏的
@@ -285,7 +285,7 @@ dst = cv.filter2D(image, -1, kernel=kernel)
 cv.imshow("custom_blur_demo" ,dst)
 ```
 
-#### <span id="head20"> 使用git, Typora，github创建笔记</span>
+#### 使用git, Typora，github创建笔记
 
 ```
 git pull git@github.com:perfectism13/learning.git
