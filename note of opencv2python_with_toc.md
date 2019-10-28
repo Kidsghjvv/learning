@@ -5,21 +5,27 @@
 	- [ waitKey函数](#head5)
 	- [ 视频与电脑摄像头输入](#head6)
 	- [ 获取图片的信息](#head7)
-	- [ 色彩空间转换](#head8)
-	- [ Print函数Tips](#head9)
-	- [ 遍历像素点](#head10)
-	- [ 矩阵操纵（创建一幅图像)](#head11)
-	- [ 获取程序执行时间](#head12)
-	- [ 提取某颜色对应的像素](#head13)
-	- [ 图像通道的合并、分离、单通道操作](#head14)
-	- [ 图像算术运算、逻辑运算](#head15)
-	- [ 调整对比度和亮度](#head16)
-	- [ ROI选择](#head17)
-	- [ 泛洪填充](#head18)
-	- [ 图像模糊（图像平滑）](#head19)
-		- [ 概述](#head20)
-		- [ 分类及应用场景](#head21)
-	- [使用git, Typora，github创建笔记](#head22)
+	- [ 绘图功能](#head8)
+	- [ 鼠标操作响应](#head9)
+	- [ 色彩空间转换](#head10)
+	- [ Print函数Tips](#head11)
+	- [ 遍历像素点](#head12)
+	- [ 矩阵操纵（创建一幅图像)](#head13)
+	- [ 获取程序执行时间](#head14)
+	- [ 提取某颜色对应的像素](#head15)
+	- [ 图像通道的合并、分离、单通道操作](#head16)
+	- [ 图像算术运算、逻辑运算](#head17)
+	- [ 调整对比度和亮度](#head18)
+	- [ ROI选择](#head19)
+	- [ 泛洪填充](#head20)
+	- [ 图像模糊（图像平滑）](#head21)
+		- [ 概述](#head22)
+		- [ 分类及应用场景](#head23)
+	- [使用git, Typora，github创建笔记](#head24)
+	- [ 在matlab中使用hough变换检测圆](#head25)
+		- [ 1.编程思路](#head26)
+		- [ 2.代码实现](#head27)
+		- [ 3.结果展示](#head28)
 [TOC]
 
 
@@ -104,19 +110,80 @@ elif k == ord('s'): # wait for 's' key to save and exit
 
 ```python
 def video_demo(): #无输入值
-#capture = cv.VideoCapture("D:/IMG_9764.MP4") #0为读取电脑摄像头，读取的视频无声音，大小有限制
-capture = cv.VideoCapture(0)
+	#capture = cv.VideoCapture("D:/IMG_9764.MP4") #0为读取电脑摄像头，读取的视频无声音，大小有限制
+	capture = cv.VideoCapture(0) #0为设备索引号，自带摄像头一般为0
+	# Define the codec and create VideoWriter object
+	fourcc = cv.VideoWriter_fourcc(*'XVID')
+	out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
+if capture.isOpened() == 1:
+print("camera has been initialized correctly")
+elif capture.isOpened() == 0:
+print("camera has not been initialized correctly")
 while(True):
-	ret, frame = capture.read() #返回值，每一帧
+	ret, frame = capture.read() #返回一个布尔值，若帧读取正确，则为True，每一帧
 	frame1 = cv.flip(frame, 1) #镜像变换 1为左右 -1为上下
 	frame2 = cv.transpose(frame) #顺时针旋转90°
 	cv.imshow("video", frame) #每一帧循环显示
 	cv.imshow("video1", frame1)
+out.write(frame1)
+print(capture.get(3)) #获取每一帧的宽度
 	cv.imshow("video2", frame2)
-	c = cv.waitKey(50) #响应用户操作
-	if c == 27:
-		break
+	c = cv.waitKey(1) #响应用户操作
+	#if c == 27:
+		#break
+#capture.release() #Closes video file or capturing device
+if c & oxFF ==ord('q')
+	break
 ```
+
+视频写入时FourCC码以cv.FOURCC('M','J','P','G') 或者cv.FOURCC(*'MJPG'）传给fourcc
+
+从文件播放视频时，使用cv.waiKey() 设置适当的持续时间，一般25ms合适，设置地高的话，视频播放地慢
+
+<u>cap.read()</u>：若帧读取正确，返回True，检查其返回值判断视频文件是否到结尾
+
+<u>cap.isOpened()</u>：摄像头成功初始化，返回True，否则使用cap.open()
+
+<u>cap.get(propId)</u>：获得视频的参数信息，propId 可以是0 到18 之间的任何整数,见下表：
+
+```python
+• CV_CAP_PROP_POS_MSEC #Current position of the video file
+in milliseconds.
+• CV_CAP_PROP_POS_FRAMES #0-based index of the frame to
+be decoded/captured next.
+• CV_CAP_PROP_POS_AVI_RATIO #Relative position of the
+video file: 0 - start of the film, 1 - end of the film.
+• CV_CAP_PROP_FRAME_WIDTH #Width of the frames in the
+video stream.
+• CV_CAP_PROP_FRAME_HEIGHT #Height of the frames in the
+video stream.
+• CV_CAP_PROP_FPS #Frame rate.
+• CV_CAP_PROP_FOURCC #4-character code of codec.
+• CV_CAP_PROP_FRAME_COUNT #Number of frames in the
+video file.
+• CV_CAP_PROP_FORMAT #Format of the Mat objects returned
+by retrieve() .
+• CV_CAP_PROP_MODE #Backend-specific value indicating the
+current capture mode.
+• CV_CAP_PROP_BRIGHTNESS #Brightness of the image (only
+for cameras).
+• CV_CAP_PROP_CONTRAST #Contrast of the image (only for
+cameras).
+• CV_CAP_PROP_SATURATION #Saturation of the image (only
+for cameras).
+• CV_CAP_PROP_HUE #Hue of the image (only for cameras).
+• CV_CAP_PROP_GAIN #Gain of the image (only for cameras).
+• CV_CAP_PROP_EXPOSURE #Exposure (only for cameras).
+• CV_CAP_PROP_CONVERT_RGB #Boolean flags indicating
+whether images should be converted to RGB.
+• CV_CAP_PROP_WHITE_BALANCE #Currently unsupported
+• CV_CAP_PROP_RECTIFICATION #Rectification flag for stereo
+cameras (note: only supported by DC1394 v 2.x backend currently)
+```
+
+cap.set(propId,value)：修改视频参数，value为新值
+
+3—width，4—hight
 
 #### <span id="head7"> 获取图片的信息</span>
 
@@ -131,7 +198,67 @@ def get_image_info(image):
 	print(image) 可以直接打印
 ```
 
-#### <span id="head8"> 色彩空间转换</span>
+#### <span id="head8"> 绘图功能</span>
+
+img：想要绘图的图像
+
+color：BGR模式输入
+
+thickness:默认为1，对于封闭图形设置为-1可实现填充
+
+lineType：8连接，抗锯齿型连接（平滑性好，cv2.LINE_AA）
+
+shift:坐标点与数轴的精度，默认为0
+
+后五个参数的顺序一般如上
+
+Drawing Line：
+
+```python
+img = np.zeros((512,512,3), np.uint8)
+img = cv2.line(img,(0,0),(511,511),(255,0,0),5) #指定直线的起点和终点，画多条线时可用cv.polylines()
+img = cv2.rectangle(img,(384,0),(510,128),(0,255,0),3) #指定矩形的左上顶点和右下顶点
+img = cv2.circle(img,(447,63), 63, (0,0,255), -1) #指定圆心，半径
+img = cv2.ellipse(img,(256,256),(100,50),0,0,180,(255, 0, 0),-1)
+#img	=	cv.ellipse(	img, center, axes, angle, startAngle, endAngle, color[, thickness[, lineType[, shift]]]	)
+
+pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
+pts = pts.reshape((-1,1,2)) #reshape 的第一个参数为-1, 表明这一维的长度是根据后面的维度的计算出来的。
+img = cv2.polylines(img,[pts],True,(0,255,255)) #若为第三个参数为False，则该多边形不封闭，首尾不想连
+
+font = cv2.FONT_HERSHEY_SIMPLEX
+cv2.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2,cv2.LINE_AA) #位置，字体类型，字体大小，颜色，粗细，线条的类型
+```
+
+![](note of opencv2python.assets/ellipse.png)
+
+#### <span id="head9"> 鼠标操作响应</span>
+
+事件列表：
+
+![](note of opencv2python.assets/event.png)
+
+```python
+# mouse callback function
+def draw_circle(event,x,y,flags, param):
+if event == cv.EVENT_LBUTTONDBLCLK:
+cv.circle(img, [x, y], 10, (255, 0, 0), -1)
+
+
+# Create a black image, a window and bind the function to window
+img = np.zeros((512, 512, 3), np.uint8)
+cv.namedWindow('image')
+cv.setMouseCallback('image', draw_circle)
+while(1):
+cv.imshow('image',img)
+if cv.waitKey(20) & 0xFF == 27:
+break
+cv.destroyAllWindows()
+```
+
+
+
+#### <span id="head10"> 色彩空间转换</span>
 
 ```python
 gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY) #获取灰度图像
@@ -140,7 +267,7 @@ gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 back_rgb = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
 ```
 
-#### <span id="head9"> Print函数Tips</span>
+#### <span id="head11"> Print函数Tips</span>
 
 ```python
 打印变量值
@@ -149,7 +276,7 @@ print("width : %s, height : %s channels : %s" % (width, height, channels))
 print(image)
 ```
 
-#### <span id="head10"> 遍历像素点</span>
+#### <span id="head12"> 遍历像素点</span>
 
 ```python
 def access_pixels(image):
@@ -165,7 +292,7 @@ def access_pixels(image):
 	cv.imshow("demo", image)
 ```
 
-#### <span id="head11"> 矩阵操纵（创建一幅图像)</span>
+#### <span id="head13"> 矩阵操纵（创建一幅图像)</span>
 
 ones创建任意维度和元素个数的数组，其元素值均为1
 empty一样，只是它所常见的数组内所有元素均为空
@@ -202,7 +329,7 @@ m3 = np.array([[1,2,3], [4,5,6], [7,8,9]],np.int32)
 
 
 
-#### <span id="head12"> 获取程序执行时间</span>
+#### <span id="head14"> 获取程序执行时间</span>
 
 ```python
 t1 = cv.getTickCount()
@@ -214,7 +341,7 @@ print("time = %s ms" % (time * 1000))
 
 可以通过调用opencv自带的API来减少程序执行时间
 
-#### <span id="head13"> 提取某颜色对应的像素</span>
+#### <span id="head15"> 提取某颜色对应的像素</span>
 
 思路：转换到HSV空间，再参考下表设置inRange函数的参数(红色设置为第二列较佳)
 
@@ -239,7 +366,7 @@ def extract_object_demo():
 		break  # escape
 ```
 
-#### <span id="head14"> 图像通道的合并、分离、单通道操作</span>
+#### <span id="head16"> 图像通道的合并、分离、单通道操作</span>
 
 ```python
 b, g, r = cv.split(src)
@@ -253,7 +380,7 @@ h, w = src.shape[0:2] #获取图像的高与宽，0可以不输入
 print(src[30, 30, :]) #打印某位置上的三个像素值
 ```
 
-#### <span id="head15"> 图像算术运算、逻辑运算</span>
+#### <span id="head17"> 图像算术运算、逻辑运算</span>
 
 ```python
 dst = cv.add(m1, m2) #相加
@@ -270,7 +397,7 @@ dst3 = cv.bitwise_not(m1) #获得负片
 
 <img src="note of opencv2python.assets/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
 
-#### <span id="head16"> 调整对比度和亮度</span>
+#### <span id="head18"> 调整对比度和亮度</span>
 
 ```python
 def contrast_brightness_demo(image, c, b):
@@ -281,7 +408,7 @@ def contrast_brightness_demo(image, c, b):
 像素运算式：dst = src1*alpha + src2*beta + gamma
 ```
 
-#### <span id="head17"> ROI选择</span>
+#### <span id="head19"> ROI选择</span>
 
 ```python
 face = src[50:250, 100:300] # [height, width]
@@ -291,7 +418,7 @@ src[50:250, 100:300] = backrgb
 cv.imshow("face", src)
 ```
 
-#### <span id="head18"> 泛洪填充</span>
+#### <span id="head20"> 泛洪填充</span>
 
 ```python
 def fill_color_demo(image):
@@ -315,9 +442,9 @@ def fill_binary():
 	cv.imshow("filled binary", image)
 ```
 
-#### <span id="head19"> 图像模糊（图像平滑）</span>
+#### <span id="head21"> 图像模糊（图像平滑）</span>
 
-##### <span id="head20"> 概述</span>
+##### <span id="head22"> 概述</span>
 
 低通滤波：去除噪音，模糊图像，但去除了高频成分（噪声、边界）
 
@@ -325,7 +452,7 @@ def fill_binary():
 
 空间滤波的数学原理:二维空间卷积
 
-##### <span id="head21"> 分类及应用场景</span>
+##### <span id="head23"> 分类及应用场景</span>
 
 平均：卷积框覆盖区域所有像素的平均值来代替中心元素
 
@@ -362,7 +489,7 @@ def custom_blur_demo(image): #自定义卷积核来模糊
 	cv.imshow("custom_blur_demo" ,dst)
 ```
 
-#### <span id="head22">使用git, Typora，github创建笔记</span>
+#### <span id="head24">使用git, Typora，github创建笔记</span>
 
 ```
 ssh-keygen -t rsa -C "youremail@example.com" #设置秘钥
@@ -389,3 +516,138 @@ git push git@github.com:perfectism13/learning.git
 windows中的ssh key在c/users/闵晨阳1998/.ssh中
 
 ubantu在home/.ssh中
+
+#### <span id="head25"> 在matlab中使用hough变换检测圆</span>
+
+##### <span id="head26"> 1.编程思路</span>
+
+1.读入图像，并将其灰度化
+
+2.利用canny算子来检测边缘
+
+3.设定检测时的半径与角度步长，预估被检测圆的半径范围
+
+4.通过圆的参数方程将图像空间(x,y)对应到参数空间(a,b,r)
+
+5.求解半径和圆心
+
+6.合并圆心临近，半径差别不大的圆
+
+7.标记出检测到的圆，并输出圆心坐标和半径
+
+##### <span id="head27"> 2.代码实现</span>
+
+```matlab
+%author：minchenyang
+image = imread('D:/opencv_imagedata/detect_blob.png');  
+figure(1),imshow(image),title('原图')
+% 将原图灰度化
+image = rgb2gray(image); 
+figure(2),imshow(image),title('灰度化的原图')  
+%采用canny算子来进行边缘检测
+edgeimage = edge(image, 'Canny', [0.3, 0.35]); 
+% 设定检测时的半径与角度步长
+step_r = 1;step_angle = 0.1; 
+%预估被检测圆的半径范围
+rmin = 10;  rmax = 100; 
+% 自动取最优的灰度阈值
+thresh = graythresh(image);  
+r_min = rmin;r_max = rmax;
+element=[];  para=[];  
+p=0.6;%p=thresh
+[h,w] = size(edgeimage);  
+size_r = round((rmax-rmin)/step_r)+1; 
+size_angle = round(2*pi/step_angle);  
+hough_space = zeros(h,w,size_r);  
+%查找二值图像中非零元素的行列坐标  
+[row,col] = find(edgeimage);
+count = size(row);  
+%通过圆的参数方程将图像空间(x,y)对应到参数空间(a,b,r)  
+for i=1:count  
+for r=1:size_r  
+for k=1:size_angle
+a = round(row(i)-(r_min+(r-1)*step_r)*cos(k*step_angle)); % a=x-r*cos(angle)  
+b = round(col(i)-(r_min+(r-1)*step_r)*sin(k*step_angle)); % b=y-r*sin(angle)   
+if(a>0&&a<=h&&b>0&&b<w)  
+hough_space(a,b,r) = hough_space(a,b,r)+1; 
+end  
+end  
+end  
+end  
+% 搜索超过阈值的聚集点
+max_para = max(max(max(hough_space)));
+num = find(hough_space>=max_para*p);  
+length = size(num);  
+%求解半径和圆心  
+for i=1:count  
+for k=1:length  
+para3 = floor(num(k)/(h*w))+1; 
+para2 = floor((num(k)-(para3-1)*(h*w))/h)+1; 
+para1 = num(k)-(para3-1)*(h*w)-(para2-1)*h;
+if((row(i)-para1)^2+(col(i)-para2)^2<(r_min+(para3-1)*step_r)^2+5&&...  
+(row(i)-para1)^2+(col(i)-para2)^2>(r_min+(para3-1)*step_r)^2-5)  
+hough_circle(row(i),col(i)) = true;  
+end  
+end  
+end
+for k=1:length  
+para3 = floor(num(k)/(h*w))+1;
+para2 = floor((num(k)-(para3-1)*(h*w))/h)+1;  
+para1 = num(k)-(para3-1)*(h*w)-(para2-1)*h;  
+element = [element;para1,para2,para3];  
+hough_circle(para1,para2)= true;  
+end  
+%合并圆心临近，半径差别不大的圆 
+while size(element,1) >= 1  
+num=1;  
+xyr=[];  
+temp1=element(1,1);temp2=element(1,2);temp3=element(1,3);  
+c1=temp1;c2=temp2;c3=temp3;  
+temp3= r_min+(temp3-1)*step_r;  
+if size(element,1)>1       
+for k=2:size(element,1)  
+if (element(k,1)-temp1)^2+(element(k,2)-temp2)^2 > temp3^2  
+xyr=[xyr;element(k,1),element(k,2),element(k,3)];  %保存剩下圆的圆心和半径位置  
+else    
+c1=c1+element(k,1);  
+c2=c2+element(k,2);  
+c3=c3+element(k,3);  
+num=num+1;  
+end   
+end  
+end   
+c1=round(c1/num);  
+c2=round(c2/num);  
+c3=round(c3/num);  
+c3=r_min+(c3-1)*step_r;      
+para=[para;c1,c2,c3]; %保存各个圆的圆心和半径的值  
+element=xyr;
+end
+figure(3),imshow(edgeimage),title('边缘')  
+figure(4),imshow(hough_circle),title('检测出的圆上的像素点')  
+element=para;  
+%标记出检测到的圆，并输出圆心坐标和半径  
+[r,~]=size(element);  
+fprintf(1,'  检测出%d个圆\n',r);  
+fprintf(1,'  圆心     半径\n'); 
+for w=1:r  
+fprintf(1,'%d （%d，%d）  %d\n',w,floor(element(w,1)),floor(element(w,2)),floor(element(w,3))); 
+end   
+figure(5),imshow(image),title('检测出图中的圆')  
+hold on;  
+plot(element(:,2), element(:,1), 'r+');  
+for k = 1 : r   
+t=0:0.01*pi:2*pi;  
+x=cos(t).*element(k,3)+element(k,2);
+y=sin(t).*element(k,3)+element(k,1);  
+plot(x,y,'.','Markersize',10);  
+end 
+```
+
+##### <span id="head28"> 3.结果展示</span>
+
+<img src="note of opencv2python.assets/1.png" style="zoom:80%;" />
+
+<img src="note of opencv2python.assets/3.png" style="zoom:80%;" />
+
+<img src="note of opencv2python.assets/5.png" style="zoom:80%;" />
