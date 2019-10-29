@@ -202,13 +202,13 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 cv2.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2,cv2.LINE_AA) #位置，字体类型，字体大小，颜色，粗细，线条的类型
 ```
 
-![](note of opencv2python.assets/ellipse.png)
+<img src="note of opencv2python.assets/ellipse.png" style="zoom:150%;" />
 
 #### 鼠标操作响应
 
 事件列表：
 
-![](note of opencv2python.assets/event.png)
+<img src="note of opencv2python.assets/event.png" style="zoom:80%;" />
 
 ```python
 # mouse callback function
