@@ -33,13 +33,35 @@ cv.waitKey(0)
 cv.destroyAllWindows()
 ```
 
-cv.IMREAD_COLOR：读入一副彩色图像。图像的透明度会被忽略，这是默认参数。
+cv.IMREAD_COLOR：读入一副彩色图像，将其转换为BGR模式，图像的透明度会被忽略，这是默认参数。
 
 cv.IMREAD_GRAYSCALE：以灰度模式读入图像
 
 cv.IMREAD_UNCHANGED：读入一幅图像，并且包括图像的alpha 通道
 
+ cv.IMREAD_ANYDEPTH ： 若设置返回相应深度图像（16位/32位），否则将其转换为8位
+
+ IMREAD_LOAD_GDAL  ：使用gda驱动载入图像
+
 可使用python自带的Matplotlib显示图像。但注意opencv为BGR，Matplotlib为RGB，被opencv的imread读入后，不能被Matplotlib显示.
+
+imwrite要求图像为BGR或灰度格式，并且每个通道有一定的位，BMP每通道8位，PNG每通道8位/16位
+
+#### 图像与原始字节之间的转换
+
+```python
+import os
+
+
+randombytearray = bytearray(os.urandom(120000))  #生成含有随机字节的bytearray数组
+nparray = np.array(randombytearray) #将其转换为numpy数组
+grayimage = nparray.reshape((300, 400)) #生成单通道数组
+bgrimage = nparray.reshape([100, 400, 3]) #生成三通道数组
+src = np.random.randint(0, 255, 120000).reshape(300, 400)  #可随机生成numpy数组
+print(src)
+```
+
+
 
 #### 窗口操作
 
@@ -57,20 +79,26 @@ cv.startWindowThread()
 
 #### waitKey函数
 
-1.使用OpenCV的imshow函数显示图片，必须配合waitKey 函数使用，才能将图片显示在windows窗体上。否则，imshow 函数单独使用只能弹出空白窗体，而无法显示图片。
+1.waitKey()返回的为-1(没有键被按下）或ASCII码值，
 
-2.waitKey的时间延迟，只对Windows窗体有效，而且是 namedWindow 函数创造的OpenCV窗体，对于MFC或者Qt这种GUI窗体是否有效是一种未知结果,
+2.使用OpenCV的imshow函数显示图片，必须配合waitKey 函数使用，才能将图片显示在windows窗体上。否则，imshow 函数单独使用只能弹出空白窗体，而无法显示图片。
+
+3.waitKey的时间延迟，只对Windows窗体有效，而且是 namedWindow 函数创造的OpenCV窗体，对于MFC或者Qt这种GUI窗体是否有效是一种未知结果,
 
 <u>不设置参数</u>：特定的几毫秒之内，如果按下任意键，这个函数会返回按键的ASCII 码值，程序将会继续运行。如果没有键盘输入，返回值为-1
 
 <u>ASCII码值</u>：0~127，共128个
+
+<img src="note of opencv2python.assets/asciifull.png" style="zoom:150%;" />
+
+<img src="note of opencv2python.assets/extend_ascii.png" style="zoom:150%;" />
 
 <u>设置参数</u>：使用waitKey(0) （无限等待）来判断相应按键操作，若为64位电脑，则需设置为k=cv2.waitKey(0)&0xFF。
 
 3.真正能起到程序暂停的作用的是我们熟悉的Windows API函数Sleep
 
 ```python
-k = cv2.waitKey(0)
+k = cv2.waitKey(0)&0xFF
 if k == 27: # wait for ESC key to exit
 	cv2.destroyAllWindows()
 elif k == ord('s'): # wait for 's' key to save and exit
@@ -86,29 +114,48 @@ def video_demo(): #无输入值
 	capture = cv.VideoCapture(0) #0为设备索引号，自带摄像头一般为0
 	# Define the codec and create VideoWriter object
 	fourcc = cv.VideoWriter_fourcc(*'XVID')
-	out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
+	out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480)) #编码类型，帧速率，帧大小
     if capture.isOpened() == 1:
         print("camera has been initialized correctly")
     elif capture.isOpened() == 0:
         print("camera has not been initialized correctly")
-while(True):
-	ret, frame = capture.read() #返回一个布尔值，若帧读取正确，则为True，每一帧
-	frame1 = cv.flip(frame, 1) #镜像变换 1为左右 -1为上下
-	frame2 = cv.transpose(frame) #顺时针旋转90°
-	cv.imshow("video", frame) #每一帧循环显示
-	cv.imshow("video1", frame1)
-    out.write(frame1)
-    print(capture.get(3)) #获取每一帧的宽度
-	cv.imshow("video2", frame2)
-	c = cv.waitKey(1) #响应用户操作
-	#if c == 27:
-		#break
-    #capture.release() #Closes video file or capturing device
-    if c & oxFF ==ord('q')
-    	break
+    ret, frame = capture.read()
+	while(True):
+		ret, frame = capture.read() #返回一个布尔值，若帧读取正确，则为True，每一帧
+		frame1 = cv.flip(frame, 1) #镜像变换 1为左右 -1为上下
+		frame2 = cv.transpose(frame) #顺时针旋转90°
+		cv.imshow("video", frame) #每一帧循环显示
+		cv.imshow("video1", frame1)
+    	out.write(frame1)
+    	print(capture.get(3)) #获取每一帧的宽度
+		cv.imshow("video2", frame2)
+		c = cv.waitKey(1) #响应用户操作
+		#if c == 27:
+			#break
+    	#capture.release() #Closes video file or capturing device
+    	if c & oxFF ==ord('q')
+        	capture.release()
+    		break
 ```
 
-视频写入时FourCC码以cv.FOURCC('M','J','P','G') 或者cv.FOURCC(*'MJPG'）传给fourcc
+cv.VideoCapture为一个类,get(CV_CAP_PROP_FPS)可返回视频帧速率的准确值，但不能返回摄像头帧速率的准确值（总是返回0），可使用计时器来测量
+
+视频写入时FourCC码以cv.FOURCC('M','J','P','G') 或者cv.FOURCC(*'MJPG'）传给fourcc，编码格式如下：
+
+```
+cv2.VideoWriter_fourcc('I','4','2','0'): This option is an
+uncompressed YUV encoding, 4:2:0 chroma subsampled. This encoding is
+widely compatible but produces large files. The file extension should be .avi.
+• cv2.VideoWriter_fourcc('P','I','M','1'): This option is MPEG-1. The
+file extension should be .avi.
+• cv2.VideoWriter_fourcc('X','V','I','D'): This option is MPEG-4 and
+a preferred option if you want the resulting video size to be average. The file
+extension should be .avi.
+• cv2.VideoWriter_fourcc('T','H','E','O'): This option is Ogg Vorbis.
+The file extension should be .ogv.
+• cv2.VideoWriter_fourcc('F','L','V','1'): This option is a Flash video.
+The file extension should be .flv.
+```
 
 从文件播放视频时，使用cv.waiKey() 设置适当的持续时间，一般25ms合适，设置地高的话，视频播放地慢
 
@@ -119,43 +166,42 @@ while(True):
 <u>cap.get(propId)</u>：获得视频的参数信息，propId 可以是0 到18 之间的任何整数,见下表：
 
 ```python
-• CV_CAP_PROP_POS_MSEC #Current position of the video file
-in milliseconds.
-• CV_CAP_PROP_POS_FRAMES #0-based index of the frame to
-be decoded/captured next.
-• CV_CAP_PROP_POS_AVI_RATIO #Relative position of the
-video file: 0 - start of the film, 1 - end of the film.
-• CV_CAP_PROP_FRAME_WIDTH #Width of the frames in the
-video stream.
-• CV_CAP_PROP_FRAME_HEIGHT #Height of the frames in the
-video stream.
-• CV_CAP_PROP_FPS #Frame rate.
+• CV_CAP_PROP_POS_MSEC #Current position of the video file in milliseconds.
+• CV_CAP_PROP_POS_FRAMES #0-based index of the frame to be decoded/captured next.
+• CV_CAP_PROP_POS_AVI_RATIO #Relative position of the video file: 0 - start of the film, 1 - end of the film.
+• CV_CAP_PROP_FRAME_WIDTH #Width of the frames in the video stream.
+• CV_CAP_PROP_FRAME_HEIGHT #Height of the frames in the video stream.
+• CV_CAP_PROP_FPS #Frame rate. 每秒帧数/帧速率/FPS
 • CV_CAP_PROP_FOURCC #4-character code of codec.
-• CV_CAP_PROP_FRAME_COUNT #Number of frames in the
-video file.
-• CV_CAP_PROP_FORMAT #Format of the Mat objects returned
-by retrieve() .
-• CV_CAP_PROP_MODE #Backend-specific value indicating the
-current capture mode.
-• CV_CAP_PROP_BRIGHTNESS #Brightness of the image (only
-for cameras).
-• CV_CAP_PROP_CONTRAST #Contrast of the image (only for
-cameras).
-• CV_CAP_PROP_SATURATION #Saturation of the image (only
-for cameras).
+• CV_CAP_PROP_FRAME_COUNT #Number of frames in the video file.
+• CV_CAP_PROP_FORMAT #Format of the Mat objects returned by retrieve() .
+• CV_CAP_PROP_MODE #Backend-specific value indicating the current capture mode.
+• CV_CAP_PROP_BRIGHTNESS #Brightness of the image (only for cameras).
+• CV_CAP_PROP_CONTRAST #Contrast of the image (only for cameras).
+• CV_CAP_PROP_SATURATION #Saturation of the image (only for cameras).
 • CV_CAP_PROP_HUE #Hue of the image (only for cameras).
 • CV_CAP_PROP_GAIN #Gain of the image (only for cameras).
 • CV_CAP_PROP_EXPOSURE #Exposure (only for cameras).
-• CV_CAP_PROP_CONVERT_RGB #Boolean flags indicating
-whether images should be converted to RGB.
+• CV_CAP_PROP_CONVERT_RGB #Boolean flags indicating whether images should be converted to RGB.
 • CV_CAP_PROP_WHITE_BALANCE #Currently unsupported
-• CV_CAP_PROP_RECTIFICATION #Rectification flag for stereo
-cameras (note: only supported by DC1394 v 2.x backend currently)
+• CV_CAP_PROP_RECTIFICATION #Rectification flag for stereocameras (note: only supported by DC1394 v 2.x backend currently)
 ```
 
 cap.set(propId,value)：修改视频参数，value为新值
 
 3—width，4—hight
+
+使用一组摄像头时：
+
+```python
+success0 = cameraCapture0.grab()
+success1 = cameraCapture1.grab()
+if success0 and success1:
+	frame0 = cameraCapture0.retrieve()
+	frame1 = cameraCapture1.retrieve()
+```
+
+
 
 #### 获取图片的信息
 
@@ -228,7 +274,56 @@ while(1):
 cv.destroyAllWindows()
 ```
 
+通过按键来控制不同的鼠标事件响应：
 
+```python
+# 当鼠标按下时变为True
+drawing = False
+# 如果mode 为true 绘制矩形。按下'm' 变成绘制曲线。
+mode = True
+ix, iy = -1, -1
+
+
+# 创建鼠标事件回调函数
+def draw_circle(event,x,y,flags,param):
+    global ix, iy, drawing, mode
+# 当按下左键是返回起始位置坐标
+    if event == cv.EVENT_LBUTTONDOWN:
+        drawing=True
+        ix, iy = x, y
+# 当鼠标左键按下并移动是绘制图形。event 可以查看移动，flag 查看是否按下
+    elif event == cv.EVENT_MOUSEMOVE and flags == cv.EVENT_FLAG_LBUTTON:
+        if drawing == True:
+            if mode == True:
+                cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
+            else:
+                #cv.circle(img,(x,y),10,(0,0,255),-1) # 绘制圆圈，小圆点连在一起就成了线，3 代表了笔画的粗细
+                # 下面注释掉的代码是起始点为圆心，起点到终点为半径的
+                r=int(np.sqrt((x-ix)**2+(y-iy)**2))
+                cv.circle(img,(ix,iy),r,(0,0,255),-1)
+                # 当鼠标松开停止绘画。
+    elif event == cv.EVENT_LBUTTONUP:
+        drawing=False
+        # if mode==True:
+        #     cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
+        # else:
+        #     cv.circle(img,(x,y),5,(0,0,255),-1)
+
+
+img = np.zeros((512, 512, 3), np.uint8)
+cv.namedWindow('image')
+cv.setMouseCallback('image',draw_circle)
+while(1):
+    cv.imshow('image', img)
+    k = cv.waitKey(1) & 0xFF
+    if k == ord('m'): #ord()可将字符转换为ASCII码
+        mode = not mode
+    elif k == 27:
+        break
+cv.destroyAllWindows()
+```
+
+opencv有限的事件处理能力与GUI处理能力，将其集成到其他应用程序框架更受欢迎
 
 ####  色彩空间转换
 
@@ -263,6 +358,8 @@ def access_pixels(image):
 				image[row, col, c] = 255 – pv        
 	cv.imshow("demo", image)
 ```
+
+优先使用索引等方法对像素点、面进行操作，使用循环会使得效率低下，尤其对于视频处理
 
 #### 矩阵操纵（创建一幅图像)
 
@@ -338,7 +435,7 @@ def extract_object_demo():
 		break  # escape
 ```
 
-####  图像通道的合并、分离、单通道操作
+####  图像通道的合并、分离、单通道操作、单像素操作
 
 ```python
 b, g, r = cv.split(src)
@@ -347,6 +444,8 @@ cv.imshow("green", g)
 cv.imshow("red", r)
 src = cv.merge([b, g, r]) # 注意此处的输入
 src[:, :, 0] = 0
+src.itemset((150, 120, 0), 255) #将蓝色通道值变为255
+print(src.itemset((150, 120, 0)))
 cv.imshow("changed image", src)
 h, w = src.shape[0:2] #获取图像的高与宽，0可以不输入
 print(src[30, 30, :]) #打印某位置上的三个像素值
