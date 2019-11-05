@@ -1,31 +1,46 @@
 - [Note of Opencv to Python](#head1)
 	- [Opencv 在Pycharm中的配置](#head2)
-	- [ 将照片读入到矩阵中，并显示](#head3)
-	- [ 窗口操作](#head4)
-	- [ waitKey函数](#head5)
-	- [ 视频与电脑摄像头输入](#head6)
-	- [ 获取图片的信息](#head7)
-	- [ 绘图功能](#head8)
-	- [ 鼠标操作响应](#head9)
-	- [ 色彩空间转换](#head10)
-	- [ Print函数Tips](#head11)
-	- [ 遍历像素点](#head12)
-	- [ 矩阵操纵（创建一幅图像)](#head13)
-	- [ 获取程序执行时间](#head14)
-	- [ 提取某颜色对应的像素](#head15)
-	- [ 图像通道的合并、分离、单通道操作](#head16)
-	- [ 图像算术运算、逻辑运算](#head17)
-	- [ 调整对比度和亮度](#head18)
-	- [ ROI选择](#head19)
-	- [ 泛洪填充](#head20)
-	- [ 图像模糊（图像平滑）](#head21)
-		- [ 概述](#head22)
-		- [ 分类及应用场景](#head23)
-	- [使用git, Typora，github创建笔记](#head24)
-	- [ 在matlab中使用hough变换检测圆](#head25)
-		- [ 1.编程思路](#head26)
-		- [ 2.代码实现](#head27)
-		- [ 3.结果展示](#head28)
+	- [ 常见图像坐标系](#head3)
+- [ 基本操作](#head4)
+	- [ 将照片读入到矩阵中，并显示](#head5)
+	- [ 图像与原始字节之间的转换](#head6)
+	- [ 窗口操作](#head7)
+	- [ waitKey函数](#head8)
+	- [ 视频与电脑摄像头输入、存储](#head9)
+	- [ 获取图片的信息](#head10)
+	- [ 绘图功能](#head11)
+	- [ 鼠标操作响应](#head12)
+	- [ 滑动条的实现](#head13)
+- [ 核心操作](#head14)
+	- [ 色彩空间转换](#head15)
+	- [ Print函数Tips](#head16)
+	- [ 遍历像素点](#head17)
+	- [ 矩阵操纵（创建一幅图像)](#head18)
+	- [ 获取程序执行时间](#head19)
+	- [ 提取某颜色对应的像素](#head20)
+	- [ 图像通道的合并、分离、单通道操作、单像素操作](#head21)
+	- [ 图像算术运算、逻辑运算](#head22)
+	- [ 调整对比度和亮度](#head23)
+	- [ ROI选择](#head24)
+- [ 图像处理](#head25)
+	- [ 泛洪填充](#head26)
+	- [ 图像模糊（图像平滑）](#head27)
+		- [ 概述](#head28)
+		- [ 分类及应用场景](#head29)
+	- [ 图像梯度](#head30)
+		- [Laplacian 算子](#head31)
+		- [ Prewitt算子](#head32)
+		- [ Sobel算子和Scharr算子](#head33)
+	- [ 边缘检测](#head34)
+		- [ Canny边缘检测](#head35)
+	- [ 轮廓检测](#head36)
+	- [ 图像阈值](#head37)
+		- [ 简单阈值](#head38)
+	- [使用git, Typora，github创建笔记](#head39)
+	- [ 在matlab中使用hough变换检测圆](#head40)
+		- [ 1.编程思路](#head41)
+		- [ 2.代码实现](#head42)
+		- [ 3.结果展示](#head43)
 [TOC]
 
 
@@ -50,7 +65,19 @@ pip install pytesseract
 
 <img src="note of opencv2python.assets/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
 
-#### <span id="head3"> 将照片读入到矩阵中，并显示</span>
+#### <span id="head3"> 常见图像坐标系</span>
+
+Opencv：
+
+<img src="note of opencv2python.assets/coordinate.PNG" style="zoom:50%;" />
+
+Matlab：
+
+<img src="note of opencv2python.assets/coordinate2.PNG" style="zoom:50%;" />
+
+### <span id="head4"> 基本操作</span>
+
+#### <span id="head5"> 将照片读入到矩阵中，并显示</span>
 
 ```python
 src = cv.imread("D:/IMG_20161227_154705.jpg")
@@ -61,15 +88,35 @@ cv.waitKey(0)
 cv.destroyAllWindows()
 ```
 
-cv.IMREAD_COLOR：读入一副彩色图像。图像的透明度会被忽略，这是默认参数。
+cv.IMREAD_COLOR：读入一副彩色图像，将其转换为BGR模式，图像的透明度会被忽略，这是默认参数。
 
 cv.IMREAD_GRAYSCALE：以灰度模式读入图像
 
 cv.IMREAD_UNCHANGED：读入一幅图像，并且包括图像的alpha 通道
 
+cv.IMREAD_ANYDEPTH ： 若设置返回相应深度图像（16位/32位），否则将其转换为8位
+
+IMREAD_LOAD_GDAL  ：使用gda驱动载入图像
+
 可使用python自带的Matplotlib显示图像。但注意opencv为BGR，Matplotlib为RGB，被opencv的imread读入后，不能被Matplotlib显示.
 
-#### <span id="head4"> 窗口操作</span>
+imwrite要求图像为BGR或灰度格式，并且每个通道有一定的位，BMP每通道8位，PNG每通道8位/16位
+
+#### <span id="head6"> 图像与原始字节之间的转换</span>
+
+```python
+import os
+
+
+randombytearray = bytearray(os.urandom(120000))  #生成含有随机字节的bytearray数组
+nparray = np.array(randombytearray) #将其转换为numpy数组
+grayimage = nparray.reshape((300, 400)) #生成单通道数组
+bgrimage = nparray.reshape([100, 400, 3]) #生成三通道数组
+src = np.random.randint(0, 255, 120000).reshape(300, 400)  #可随机生成numpy数组
+print(src)
+```
+
+#### <span id="head7"> 窗口操作</span>
 
 ```python
 cv.namedWindow("input", cv.WINDOW_AUTOSIZE) 适应图片大小
@@ -83,22 +130,28 @@ cv.startWindowThread()
 
 在调用cv.startWindowThread();后，即使没有调用waitKey()函数，图片也依然实时刷新。opencv的imshow()函数调用以后，并不立即刷新显示图片，而是等到waitKey()后才会刷新图片显示，所以cv.startWindowThread();是新开一个线程实时刷新图片显示。
 
-#### <span id="head5"> waitKey函数</span>
+#### <span id="head8"> waitKey函数</span>
 
-1.使用OpenCV的imshow函数显示图片，必须配合waitKey 函数使用，才能将图片显示在windows窗体上。否则，imshow 函数单独使用只能弹出空白窗体，而无法显示图片。
+1.waitKey()返回的为-1(没有键被按下）或ASCII码值，
 
-2.waitKey的时间延迟，只对Windows窗体有效，而且是 namedWindow 函数创造的OpenCV窗体，对于MFC或者Qt这种GUI窗体是否有效是一种未知结果,
+2.使用OpenCV的imshow函数显示图片，必须配合waitKey 函数使用，才能将图片显示在windows窗体上。否则，imshow 函数单独使用只能弹出空白窗体，而无法显示图片。
+
+3.waitKey的时间延迟，只对Windows窗体有效，而且是 namedWindow 函数创造的OpenCV窗体，对于MFC或者Qt这种GUI窗体是否有效是一种未知结果,
 
 <u>不设置参数</u>：特定的几毫秒之内，如果按下任意键，这个函数会返回按键的ASCII 码值，程序将会继续运行。如果没有键盘输入，返回值为-1
 
 <u>ASCII码值</u>：0~127，共128个
+
+<img src="note of opencv2python.assets/asciifull.png" style="zoom:150%;" />
+
+<img src="note of opencv2python.assets/extend_ascii.png" style="zoom:150%;" />
 
 <u>设置参数</u>：使用waitKey(0) （无限等待）来判断相应按键操作，若为64位电脑，则需设置为k=cv2.waitKey(0)&0xFF。
 
 3.真正能起到程序暂停的作用的是我们熟悉的Windows API函数Sleep
 
 ```python
-k = cv2.waitKey(0)
+k = cv2.waitKey(0)&0xFF
 if k == 27: # wait for ESC key to exit
 	cv2.destroyAllWindows()
 elif k == ord('s'): # wait for 's' key to save and exit
@@ -106,7 +159,7 @@ elif k == ord('s'): # wait for 's' key to save and exit
 	cv2.destroyAllWindows()
 ```
 
-#### <span id="head6"> 视频与电脑摄像头输入</span>
+#### <span id="head9"> 视频与电脑摄像头输入、存储</span>
 
 ```python
 def video_demo(): #无输入值
@@ -114,29 +167,48 @@ def video_demo(): #无输入值
 	capture = cv.VideoCapture(0) #0为设备索引号，自带摄像头一般为0
 	# Define the codec and create VideoWriter object
 	fourcc = cv.VideoWriter_fourcc(*'XVID')
-	out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480))
+	out = cv2.VideoWriter('output.avi',fourcc, 20.0, (640,480)) #编码类型，帧速率，帧大小
 if capture.isOpened() == 1:
 print("camera has been initialized correctly")
 elif capture.isOpened() == 0:
 print("camera has not been initialized correctly")
-while(True):
-	ret, frame = capture.read() #返回一个布尔值，若帧读取正确，则为True，每一帧
-	frame1 = cv.flip(frame, 1) #镜像变换 1为左右 -1为上下
-	frame2 = cv.transpose(frame) #顺时针旋转90°
-	cv.imshow("video", frame) #每一帧循环显示
-	cv.imshow("video1", frame1)
-out.write(frame1)
-print(capture.get(3)) #获取每一帧的宽度
-	cv.imshow("video2", frame2)
-	c = cv.waitKey(1) #响应用户操作
-	#if c == 27:
-		#break
-#capture.release() #Closes video file or capturing device
-if c & oxFF ==ord('q')
-	break
+ret, frame = capture.read()
+	while(True):
+		ret, frame = capture.read() #返回一个布尔值，若帧读取正确，则为True，每一帧
+		frame1 = cv.flip(frame, 1) #镜像变换 1为左右 -1为上下
+		frame2 = cv.transpose(frame) #顺时针旋转90°
+		cv.imshow("video", frame) #每一帧循环显示
+		cv.imshow("video1", frame1)
+	out.write(frame1)
+	print(capture.get(3)) #获取每一帧的宽度
+		cv.imshow("video2", frame2)
+		c = cv.waitKey(1) #响应用户操作
+		#if c == 27:
+			#break
+	#capture.release() #Closes video file or capturing device
+	if c & oxFF ==ord('q')
+	capture.release()
+		break
 ```
 
-视频写入时FourCC码以cv.FOURCC('M','J','P','G') 或者cv.FOURCC(*'MJPG'）传给fourcc
+cv.VideoCapture为一个类,get(CV_CAP_PROP_FPS)可返回视频帧速率的准确值，但不能返回摄像头帧速率的准确值（总是返回0），可使用计时器来测量
+
+视频写入时FourCC码以cv.FOURCC('M','J','P','G') 或者cv.FOURCC(*'MJPG'）传给fourcc，编码格式如下：
+
+```
+cv2.VideoWriter_fourcc('I','4','2','0'): This option is an
+uncompressed YUV encoding, 4:2:0 chroma subsampled. This encoding is
+widely compatible but produces large files. The file extension should be .avi.
+• cv2.VideoWriter_fourcc('P','I','M','1'): This option is MPEG-1. The
+file extension should be .avi.
+• cv2.VideoWriter_fourcc('X','V','I','D'): This option is MPEG-4 and
+a preferred option if you want the resulting video size to be average. The file
+extension should be .avi.
+• cv2.VideoWriter_fourcc('T','H','E','O'): This option is Ogg Vorbis.
+The file extension should be .ogv.
+• cv2.VideoWriter_fourcc('F','L','V','1'): This option is a Flash video.
+The file extension should be .flv.
+```
 
 从文件播放视频时，使用cv.waiKey() 设置适当的持续时间，一般25ms合适，设置地高的话，视频播放地慢
 
@@ -147,45 +219,44 @@ if c & oxFF ==ord('q')
 <u>cap.get(propId)</u>：获得视频的参数信息，propId 可以是0 到18 之间的任何整数,见下表：
 
 ```python
-• CV_CAP_PROP_POS_MSEC #Current position of the video file
-in milliseconds.
-• CV_CAP_PROP_POS_FRAMES #0-based index of the frame to
-be decoded/captured next.
-• CV_CAP_PROP_POS_AVI_RATIO #Relative position of the
-video file: 0 - start of the film, 1 - end of the film.
-• CV_CAP_PROP_FRAME_WIDTH #Width of the frames in the
-video stream.
-• CV_CAP_PROP_FRAME_HEIGHT #Height of the frames in the
-video stream.
-• CV_CAP_PROP_FPS #Frame rate.
+• CV_CAP_PROP_POS_MSEC #Current position of the video file in milliseconds.
+• CV_CAP_PROP_POS_FRAMES #0-based index of the frame to be decoded/captured next.
+• CV_CAP_PROP_POS_AVI_RATIO #Relative position of the video file: 0 - start of the film, 1 - end of the film.
+• CV_CAP_PROP_FRAME_WIDTH #Width of the frames in the video stream.
+• CV_CAP_PROP_FRAME_HEIGHT #Height of the frames in the video stream.
+• CV_CAP_PROP_FPS #Frame rate. 每秒帧数/帧速率/FPS
 • CV_CAP_PROP_FOURCC #4-character code of codec.
-• CV_CAP_PROP_FRAME_COUNT #Number of frames in the
-video file.
-• CV_CAP_PROP_FORMAT #Format of the Mat objects returned
-by retrieve() .
-• CV_CAP_PROP_MODE #Backend-specific value indicating the
-current capture mode.
-• CV_CAP_PROP_BRIGHTNESS #Brightness of the image (only
-for cameras).
-• CV_CAP_PROP_CONTRAST #Contrast of the image (only for
-cameras).
-• CV_CAP_PROP_SATURATION #Saturation of the image (only
-for cameras).
+• CV_CAP_PROP_FRAME_COUNT #Number of frames in the video file.
+• CV_CAP_PROP_FORMAT #Format of the Mat objects returned by retrieve() .
+• CV_CAP_PROP_MODE #Backend-specific value indicating the current capture mode.
+• CV_CAP_PROP_BRIGHTNESS #Brightness of the image (only for cameras).
+• CV_CAP_PROP_CONTRAST #Contrast of the image (only for cameras).
+• CV_CAP_PROP_SATURATION #Saturation of the image (only for cameras).
 • CV_CAP_PROP_HUE #Hue of the image (only for cameras).
 • CV_CAP_PROP_GAIN #Gain of the image (only for cameras).
 • CV_CAP_PROP_EXPOSURE #Exposure (only for cameras).
-• CV_CAP_PROP_CONVERT_RGB #Boolean flags indicating
-whether images should be converted to RGB.
+• CV_CAP_PROP_CONVERT_RGB #Boolean flags indicating whether images should be converted to RGB.
 • CV_CAP_PROP_WHITE_BALANCE #Currently unsupported
-• CV_CAP_PROP_RECTIFICATION #Rectification flag for stereo
-cameras (note: only supported by DC1394 v 2.x backend currently)
+• CV_CAP_PROP_RECTIFICATION #Rectification flag for stereocameras (note: only supported by DC1394 v 2.x backend currently)
 ```
 
 cap.set(propId,value)：修改视频参数，value为新值
 
 3—width，4—hight
 
-#### <span id="head7"> 获取图片的信息</span>
+使用一组摄像头时：
+
+```python
+success0 = cameraCapture0.grab()
+success1 = cameraCapture1.grab()
+if success0 and success1:
+	frame0 = cameraCapture0.retrieve()
+	frame1 = cameraCapture1.retrieve()
+```
+
+
+
+#### <span id="head10"> 获取图片的信息</span>
 
 ```python
 def get_image_info(image):
@@ -198,7 +269,7 @@ def get_image_info(image):
 	print(image) 可以直接打印
 ```
 
-#### <span id="head8"> 绘图功能</span>
+#### <span id="head11"> 绘图功能</span>
 
 img：想要绘图的图像
 
@@ -232,7 +303,7 @@ cv2.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2,cv2.LINE_AA) #位置�
 
 <img src="note of opencv2python.assets/ellipse.png" style="zoom:150%;" />
 
-#### <span id="head9"> 鼠标操作响应</span>
+#### <span id="head12"> 鼠标操作响应</span>
 
 事件列表：
 
@@ -256,9 +327,94 @@ break
 cv.destroyAllWindows()
 ```
 
+通过按键来控制不同的鼠标事件响应：
+
+```python
+# 当鼠标按下时变为True
+drawing = False
+# 如果mode 为true 绘制矩形。按下'm' 变成绘制曲线。
+mode = True
+ix, iy = -1, -1
 
 
-#### <span id="head10"> 色彩空间转换</span>
+# 创建鼠标事件回调函数
+def draw_circle(event,x,y,flags,param):
+global ix, iy, drawing, mode
+# 当按下左键是返回起始位置坐标
+if event == cv.EVENT_LBUTTONDOWN:
+drawing=True
+ix, iy = x, y
+# 当鼠标左键按下并移动是绘制图形。event 可以查看移动，flag 查看是否按下
+elif event == cv.EVENT_MOUSEMOVE and flags == cv.EVENT_FLAG_LBUTTON:
+if drawing == True:
+if mode == True:
+cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
+else:
+#cv.circle(img,(x,y),10,(0,0,255),-1) # 绘制圆圈，小圆点连在一起就成了线，3 代表了笔画的粗细
+# 下面注释掉的代码是起始点为圆心，起点到终点为半径的
+r=int(np.sqrt((x-ix)**2+(y-iy)**2))
+cv.circle(img,(ix,iy),r,(0,0,255),-1)
+# 当鼠标松开停止绘画。
+elif event == cv.EVENT_LBUTTONUP:
+drawing=False
+# if mode==True:
+#     cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
+# else:
+#     cv.circle(img,(x,y),5,(0,0,255),-1)
+
+
+img = np.zeros((512, 512, 3), np.uint8)
+cv.namedWindow('image')
+cv.setMouseCallback('image',draw_circle)
+while(1):
+cv.imshow('image', img)
+k = cv.waitKey(1) & 0xFF
+if k == ord('m'): #ord()可将字符转换为ASCII码
+mode = not mode
+elif k == 27:
+break
+cv.destroyAllWindows()
+```
+
+opencv有限的事件处理能力与GUI处理能力，将其集成到其他应用程序框架更受欢迎
+
+#### <span id="head13"> 滑动条的实现</span>
+
+```python
+import cv2
+import numpy as np
+
+
+def nothing(x):
+pass
+# 创建一副黑色图像
+img=np.zeros((300,512,3),np.uint8)
+cv2.namedWindow('image')
+cv2.createTrackbar('R','image',0,255,nothing)
+cv2.createTrackbar('G','image',0,255,nothing)
+cv2.createTrackbar('B','image',0,255,nothing)
+switch='0:OFF\n1:ON'
+cv2.createTrackbar(switch,'image',0,1,nothing)
+while(1):
+cv2.imshow('image',img)
+k=cv2.waitKey(1)&0xFF
+if k==27:
+break
+r=cv2.getTrackbarPos('R','image')
+g=cv2.getTrackbarPos('G','image')
+b=cv2.getTrackbarPos('B','image')
+s=cv2.getTrackbarPos(switch,'image')
+if s==0:
+img[:]=0
+else:
+img[:]=[b,g,r]
+#img = cv2.merge([b, g, r])
+cv2.destroyAllWindows()
+```
+
+### <span id="head14"> 核心操作</span>
+
+#### <span id="head15"> 色彩空间转换</span>
 
 ```python
 gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY) #获取灰度图像
@@ -267,7 +423,11 @@ gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 back_rgb = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
 ```
 
-#### <span id="head11"> Print函数Tips</span>
+灰度：去除彩色信息将其转换成灰阶，对人脸检测等中间处理特别有效
+
+HSV：H（Hue）色调，S(Saturation)饱和度，V（Value）表示黑暗程度或光谱另一端的明亮程度，便于色彩区分 ，opencv中将hue值设为0-180，便于用uint8表示
+
+#### <span id="head16"> Print函数Tips</span>
 
 ```python
 打印变量值
@@ -276,7 +436,7 @@ print("width : %s, height : %s channels : %s" % (width, height, channels))
 print(image)
 ```
 
-#### <span id="head12"> 遍历像素点</span>
+#### <span id="head17"> 遍历像素点</span>
 
 ```python
 def access_pixels(image):
@@ -292,7 +452,9 @@ def access_pixels(image):
 	cv.imshow("demo", image)
 ```
 
-#### <span id="head13"> 矩阵操纵（创建一幅图像)</span>
+优先使用索引等方法对像素点、面进行操作，使用循环会使得效率低下，尤其对于视频处理
+
+#### <span id="head18"> 矩阵操纵（创建一幅图像)</span>
 
 ones创建任意维度和元素个数的数组，其元素值均为1
 empty一样，只是它所常见的数组内所有元素均为空
@@ -329,7 +491,7 @@ m3 = np.array([[1,2,3], [4,5,6], [7,8,9]],np.int32)
 
 
 
-#### <span id="head14"> 获取程序执行时间</span>
+#### <span id="head19"> 获取程序执行时间</span>
 
 ```python
 t1 = cv.getTickCount()
@@ -341,7 +503,7 @@ print("time = %s ms" % (time * 1000))
 
 可以通过调用opencv自带的API来减少程序执行时间
 
-#### <span id="head15"> 提取某颜色对应的像素</span>
+#### <span id="head20"> 提取某颜色对应的像素</span>
 
 思路：转换到HSV空间，再参考下表设置inRange函数的参数(红色设置为第二列较佳)
 
@@ -366,7 +528,7 @@ def extract_object_demo():
 		break  # escape
 ```
 
-#### <span id="head16"> 图像通道的合并、分离、单通道操作</span>
+#### <span id="head21"> 图像通道的合并、分离、单通道操作、单像素操作</span>
 
 ```python
 b, g, r = cv.split(src)
@@ -375,12 +537,14 @@ cv.imshow("green", g)
 cv.imshow("red", r)
 src = cv.merge([b, g, r]) # 注意此处的输入
 src[:, :, 0] = 0
+src.itemset((150, 120, 0), 255) #将蓝色通道值变为255
+print(src.itemset((150, 120, 0)))
 cv.imshow("changed image", src)
 h, w = src.shape[0:2] #获取图像的高与宽，0可以不输入
 print(src[30, 30, :]) #打印某位置上的三个像素值
 ```
 
-#### <span id="head17"> 图像算术运算、逻辑运算</span>
+#### <span id="head22"> 图像算术运算、逻辑运算</span>
 
 ```python
 dst = cv.add(m1, m2) #相加
@@ -397,7 +561,7 @@ dst3 = cv.bitwise_not(m1) #获得负片
 
 <img src="note of opencv2python.assets/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
 
-#### <span id="head18"> 调整对比度和亮度</span>
+#### <span id="head23"> 调整对比度和亮度</span>
 
 ```python
 def contrast_brightness_demo(image, c, b):
@@ -408,7 +572,7 @@ def contrast_brightness_demo(image, c, b):
 像素运算式：dst = src1*alpha + src2*beta + gamma
 ```
 
-#### <span id="head19"> ROI选择</span>
+#### <span id="head24"> ROI选择</span>
 
 ```python
 face = src[50:250, 100:300] # [height, width]
@@ -418,7 +582,9 @@ src[50:250, 100:300] = backrgb
 cv.imshow("face", src)
 ```
 
-#### <span id="head20"> 泛洪填充</span>
+### <span id="head25"> 图像处理</span>
+
+#### <span id="head26"> 泛洪填充</span>
 
 ```python
 def fill_color_demo(image):
@@ -442,21 +608,21 @@ def fill_binary():
 	cv.imshow("filled binary", image)
 ```
 
-#### <span id="head21"> 图像模糊（图像平滑）</span>
+#### <span id="head27"> 图像模糊（图像平滑）</span>
 
-##### <span id="head22"> 概述</span>
+##### <span id="head28"> 概述</span>
 
-低通滤波：去除噪音，模糊图像，但去除了高频成分（噪声、边界）
+低通滤波：去噪，模糊图像，但去除了高频成分（噪声、边界）
 
-高通滤波：找到边缘
+高通滤波（图像梯度）：找到边缘
 
 空间滤波的数学原理:二维空间卷积
 
-##### <span id="head23"> 分类及应用场景</span>
+##### <span id="head29"> 分类及应用场景</span>
 
 平均：卷积框覆盖区域所有像素的平均值来代替中心元素
 
-高斯：方框中心的值最大，其余方框根据距离中心元素的距离递减，构成一个高斯小山包。原来的求平均数现在变成求加权平均数，权就是方框里的值，X与y方向的标准差相等，若设置为0，则函数根据核的大小自动计算
+高斯(低通滤波器之一）：方框中心的值最大，其余方框根据距离中心元素的距离递减，构成一个高斯小山包。原来的求平均数现在变成求加权平均数，权就是方框里的值，X与y方向的标准差相等，若设置为0，则函数根据核的大小自动计算
 
 ```python
 # 0是指根据窗口大小（5,5）来计算高斯函数标准差
@@ -465,7 +631,7 @@ blur = cv2.GaussianBlur(img,(5,5),0)
 
 只考虑像素之间的空间关系，而不会考虑像素值之间的关系（像素的相似度）
 
-中值：用与卷积框对应像素的中值来替代中心像素的值，去除椒盐噪声
+中值：用与卷积框对应像素的中值来替代中心像素的值，去除椒盐噪声、数字化的视频噪声尤其是彩色图像的噪声，但对于较大ksize，代价较高
 
 双边：保持边界清晰的情况下有效的去除噪音，使用空间高斯权重（位置差异越小权重越大）与灰度值相似性高斯权重（灰度值差异越小权重越大）,边缘处灰度值与中心像素灰度值相比变化大，权重小不会被模糊
 
@@ -474,7 +640,9 @@ blur = cv2.GaussianBlur(img,(5,5),0)
 blur = cv2.bilateralFilter(img,9,75,75)
 ```
 
-关于算子：元素个数为奇数，总和为0：进行边缘和梯度计算，总和为1进行增强锐化等
+关于算子：元素个数为奇数（奇数行奇数列），<u>总和为0</u>：进行边缘和梯度计算，
+
+<u>总和为1</u>：进行增强锐化等，相当于将感兴趣像素与其邻近像素值间的差放大，图像的亮度没有改变
 Tips：blurry模糊的，不清楚的，污脏的
 
 <img src="note of opencv2python.assets/1571712321721.png" alt="1571712321721" style="zoom:80%;" />
@@ -485,11 +653,236 @@ dst = cv.medianBlur(image, 5) #中值模糊
 def custom_blur_demo(image): #自定义卷积核来模糊
 	# kernel = np.ones([5, 5], np.float32)/25 #最多25个255，防止溢出
 	kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], np.float32)
-	dst = cv.filter2D(image, -1, kernel=kernel)
+	dst = cv.filter2D(image, -1, kernel=kernel) #-1表示目标图像与源图像的位深度相同
 	cv.imshow("custom_blur_demo" ,dst)
 ```
 
-#### <span id="head24">使用git, Typora，github创建笔记</span>
+filter2D()对每个通道使用相同的核，若要每个通道的核不同，则使用split分离通道，再用merge合并
+
+```python
+from scipy import ndimage
+
+
+kernel_3x3 = np.array([[-1, -1, -1],
+[-1,  8, -1],
+[-1, -1, -1]])
+k3 = ndimage.convolve(img, kernel_3x3) #通过numpy的ndimage的convolve可以实现两个矩阵之间的卷积
+```
+
+#### <span id="head30"> 图像梯度</span>
+
+二维函数的梯度定义为向量,其幅度即模如下：
+$$
+\begin{array}{c}{\nabla \boldsymbol{f}=\left[\begin{array}{c}{g_{x}} \\ {g_{y}}\end{array}\right]=\left[\begin{array}{c}{\frac{\partial f}{\partial x}} \\ {\frac{\partial f}{\partial y}}\end{array}\right]} \\ {\nabla f=\operatorname{mag}(\nabla \boldsymbol{f})=\left[\begin{array}{c}{x_{x}^{2}+g_{y}^{2}}\end{array}\right]^{1 / 2}=\left[(\partial f / \partial x)^{2}+(\partial f / \partial y)^{2}\right]^{1 / 2}}\end{array}
+$$
+可由绝对值来近似：
+$$
+\nabla f \approx\left|g_{x}\right|+\left|g_{y}\right|
+$$
+
+离散化表示：
+$$
+\begin{aligned} g_{x} &=\frac{\partial f(x, y)}{\partial x}= f(x+1, y)-f(x, y) \\ g_{y} &=\frac{\partial f(x, y)}{\partial y}= f(x, y+1)-f(x, y) \end{aligned}
+$$
+
+##### <span id="head31">Laplacian 算子</span>
+
+可用来计算图像的二阶导数，推导在Matlab图像坐标系下进行：
+$$
+\begin{array}{c}{\nabla^{2} f(x, y)=\frac{\partial^{2} f(x, y)}{\partial x^{2}}+\frac{\partial^{2} f(x, y)}{\partial y^{2}}} \\ {\frac{\partial^{2} f(x, y)}{\partial x^{2}}=f(x+1, y)+f(x-1, y)-2 f(x, y)} \\ {\frac{\partial^{2} f(x, y)}{\partial y^{2}}=f(x, y+1)+f(x, y-1)-2 f(x, y)}  \\{\nabla^{2} f(x, y)=[f(x+1, y)+f(x-1, y)+f(x, y+1)+f(x, y-1)]-4 f(x, y)}\end{array}
+$$
+
+$$
+\begin{array}{ccc}{0} & {1} & {0} \\ {-1} & {-4} & {1} \\ {0} & {1} & {0} \\ \\ {1} & {1} & {1} \\ {1} & {-8} & {1} \\ {1} & {1} & {1}\end{array}
+$$
+
+第二个算子为考虑了对角线元素的效果
+
+```
+#cv2.CV_64F 输出图像的深度（数据类型），可以使用-1, 与原图像保持一致np.uint8
+laplacian=cv2.Laplacian(img,cv2.CV_64F)
+```
+
+##### <span id="head32"> Prewitt算子</span>
+
+$$
+\begin{array}{l}{g_{x}=\frac{\partial f}{\partial x}=\left(z_{7}+z_{8}+z_{9}\right)-\left(z_{1}+z_{2}+z_{3}\right)} \\ {g_{y}=\frac{\partial f}{\partial y}=\left(z_{3}+z_{6}+z_{9}\right)-\left(z_{1}+z_{4}+z_{7}\right)}\end{array}
+$$
+
+对角线方向：
+$$
+\begin{array}{l}{g_{x}^{\prime}=\left(z_{2}+z_{3}+z_{6}\right)-\left(z_{4}+z_{7}+z_{8}\right)} \\ {g_{y}^{\prime}=\left(z_{6}+z_{8}+z_{9}\right)-\left(z_{1}+z_{2}+z_{4}\right)}\end{array}
+$$
+<img src="note of opencv2python.assets/prewitt.PNG" style="zoom:50%;" />
+
+##### <span id="head33"> Sobel算子和Scharr算子</span>
+
+Sobel 算子是高斯平滑与微分操作的结合体，所以它的抗噪声能力很好。你可以设定求导的方向（xorder 或yorder）。还可以设定使用的卷积核的大小（ksize）。如果ksize=-1，会使用3x3 的Scharr 滤波器，它的的效果要比3x3 的Sobel 滤波器好（而且速度相同，所以在使用3x3 滤波器时应该尽量使用Scharr 滤波器）。3x3 的
+
+Sobel算子的卷积核：
+$$
+\begin{array}{l}{g_{x}=\frac{\partial f}{\partial x}=\left(z_{7}+2 z_{8}+z_{9}\right)-\left(z_{1}+2 z_{2}+z_{3}\right)} \\ {g_{y}=\frac{\partial f}{\partial y}=\left(z_{3}+2 z_{6}+z_{9}\right)-\left(z_{1}+2 z_{4}+z_{7}\right)}\end{array}
+$$
+<img src="note of opencv2python.assets/sobel.PNG" style="zoom:50%;" />
+
+Scharr 滤波器卷积核如下：
+
+X方向：
+$$
+\begin{array}{|c|c|c|}\hline-3 & {0} & {3} \\ \hline-10 & {0} & {10} \\ \hline-3 & {0} & {3} \\ \hline\end{array}
+$$
+Y方向：
+$$
+\begin{array}{|c|c|c|}\hline-3 & {-10} & {-3} \\ \hline 0 & {0} & {0} \\ \hline 3 & {10} & {3} \\ \hline\end{array}
+$$
+
+
+```python
+# 参数1,0 为只在x 方向求一阶导数，最大可以求2 阶导数。
+sobelx=cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+# 参数0,1 为只在y 方向求一阶导数，最大可以求2 阶导数。
+sobely=cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
+```
+
+当我们可以通过参数 -1 来设定输出图像的深度（数据类型）与原图像保持一致，但是我们在代码中使用的却是 cv2.CV_64F。这是为什么呢？想象一下一个从黑到白的边界的导数是正数，而一个从白到黑的边界点导数却是负数。如果原图像的深度是np.int8 时，所有的负值都会被截断变成 0，换句话说就是把把边界丢失掉。所以如果这两种边界你都想检测到，最好的的办法就是将输出的数据类型设置的更高，比如 cv2.CV_16S，cv2.CV_64F 等。取绝对值然后再把它转回到 cv2.CV_8U
+
+```python
+# Output dtype = cv2.CV_8U
+sobelx8u = cv2.Sobel(img,cv2.CV_8U,1,0,ksize=5)# 也可以将参数设为-1
+#sobelx8u = cv2.Sobel(img,-1,1,0,ksize=5)
+# Output dtype = cv2.CV_64F. Then take its absolute and convert to cv2.CV_8U
+sobelx64f = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+abs_sobel64f = np.absolute(sobelx64f)
+sobel_8u = np.uint8(abs_sobel64f)
+```
+
+#### <span id="head34"> 边缘检测</span>
+
+Laplacian(),sobel,scharr等会将噪声错误地识别为边缘，故在此之前应进行中值滤波和灰度化
+
+核的元素值之和为0，将边缘转为白色，非边缘转为黑色
+
+##### <span id="head35"> Canny边缘检测</span>
+
+John F.Canny 在1986 年提出的，分为以下五步：
+
+1. 使用高斯滤波器去噪
+
+2. 使用Sobel算子计算水平方向和垂直方向梯度，找到边界的梯度和方向
+$$
+\begin{array}{c}{\text { Edge-Gradient }(G)=\sqrt{G_{x}^{2}+G_{y}^{2}}} \\ {\text { Angle }(\theta)=\tan ^{-1}\left(\frac{G_{x}}{G_{y}}\right)}\end{array}
+$$
+
+梯度的方向一般总是与边界垂直。梯度方向被归为四类：垂直，水平，和两个对角线
+
+3.在边缘上使用非最大抑制（NMS）
+
+在获得梯度的方向和大小之后，应该对整幅图像做一个扫描，去除那些非边界上的点。对每一个像素进行检查，看这个点的梯度是不是周围具有相同梯度方向的点中最大的。
+
+4.检测到的边缘上使用双阈值去除假阳性：
+
+当图像的灰度梯度高于maxVal 时被认为是真的边界，那些低于minVal 的边界会被抛弃。如果介于两者之间的话，就要看这个点是否与某个被确定为真正的边界点相连，如果是就认为它也是边界点，如果不是就抛弃
+
+<img src="note of opencv2python.assets/double_threshold.PNG" style="zoom:50%;" />
+
+5.分析所有边缘及其间的连接，保留真正的边缘，消除不明显的边缘
+
+函数实现:cv2.Canny()
+
+第一个参数是输入图像。第二和第三个分别是minVal 和maxVal。第三个参数设置用来计算图像梯度的Sobel
+卷积核的大小，默认值为3。最后一个参数是L2gradient，它可以用来设定求梯度大小的方程。若为True，平方和开根号，若为False，用绝对值之和来近似，默认为False。
+
+```python
+img=cv2.Canny(img, 50, 150, apertureSize=3, L2gradient=True)
+```
+
+用滑动条观看阈值对检测效果的影响：
+
+```python
+# something wrong
+def nothing(x):
+pass
+
+img = cv2.imread("../images/statue_small.jpg", 1)
+
+cv2.namedWindow('canny')
+cv2.createTrackbar('minval','canny',0,255, nothing)
+cv2.createTrackbar('maxval','canny',0,255, nothing)
+while(1):
+minval = cv2.getTrackbarPos('minval','canny')
+maxval = cv2.getTrackbarPos('maxval','canny')
+canny = cv2.Canny(img, minval, maxval)
+cv2.imshow("image", img)
+cv2.imshow("canny", canny)
+k = cv2.waitKey(0)
+if k == 27:
+break
+cv2.destroyAllWindows()
+```
+
+#### <span id="head36"> 轮廓检测</span>
+
+
+
+#### <span id="head37"> 图像阈值</span>
+
+##### <span id="head38"> 简单阈值</span>
+
+cv2.threshhold()：
+
+- 第一个参数就是原图像，原图像应该是灰度图
+
+- 第二个参数就是用来对像素值进行分类的阈值
+
+- 第三个参数就是当像素值高于（有时是小于）阈值时应该被赋予的新的像素值
+
+- 第四个参数表示阈值方法
+
+cv2.THRESH_BINARY：
+$$
+\operatorname{dst}(x, y)=\left\{\begin{array}{c}{\text { maxval } i f \operatorname{src}(x, y)>\text { thresh }} \\ {0 \text { otherwise }}\end{array}\right.
+$$
+cv2.THRESH_BINARY_INV：
+$$
+\operatorname{dst}(x, y)=\left\{\begin{array}{c}{0 \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {\text { maxval otherwise }}\end{array}\right.
+$$
+cv2.THRESH_TRUNC：
+$$
+\operatorname{dst}(x, y)=\left\{\begin{array}{c}{\text { threshold } i f \operatorname{src}(x, y)>\text { thresh }} \\ {\operatorname{src}(x, y) \text { otherwise }}\end{array}\right.
+$$
+cv2.THRESH_TOZERO：
+$$
+\operatorname{dst}(x, y)=\left\{\begin{array}{c}{\operatorname{src}(x, y) \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {0 \text { otherwise }}\end{array}\right.
+$$
+cv2.THRESH_TOZERO_INV：
+$$
+\operatorname{dst}(x, y)=\left\{\begin{array}{c}{0 \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {\operatorname{src}(x, y) \text { otherwise }}\end{array}\right.
+$$
+
+例如：
+
+```python
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+img=cv2.imread('gradient.png',0)
+ret,thresh1=cv2.threshold(img,127,255,cv2.THRESH_BINARY)
+ret,thresh2=cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+ret,thresh3=cv2.threshold(img,127,255,cv2.THRESH_TRUNC)
+ret,thresh4=cv2.threshold(img,127,255,cv2.THRESH_TOZERO)
+ret,thresh5=cv2.threshold(img,127,255,cv2.THRESH_TOZERO_INV)
+titles = ['Original Image','BINARY','BINARY_INV','TRUNC','TOZERO','TOZERO_INV']
+images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
+for i in xrange(6):
+	plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+	plt.title(titles[i])
+	plt.xticks([]),plt.yticks([])
+plt.show()
+```
+
+
+
+#### <span id="head39">使用git, Typora，github创建笔记</span>
 
 ```
 ssh-keygen -t rsa -C "youremail@example.com" #设置秘钥
@@ -517,9 +910,9 @@ windows中的ssh key在c/users/闵晨阳1998/.ssh中
 
 ubantu在home/.ssh中
 
-#### <span id="head25"> 在matlab中使用hough变换检测圆</span>
+#### <span id="head40"> 在matlab中使用hough变换检测圆</span>
 
-##### <span id="head26"> 1.编程思路</span>
+##### <span id="head41"> 1.编程思路</span>
 
 1.读入图像，并将其灰度化
 
@@ -535,7 +928,7 @@ ubantu在home/.ssh中
 
 7.标记出检测到的圆，并输出圆心坐标和半径
 
-##### <span id="head27"> 2.代码实现</span>
+##### <span id="head42"> 2.代码实现</span>
 
 ```matlab
 %author：minchenyang
@@ -644,7 +1037,7 @@ plot(x,y,'.','Markersize',10);
 end 
 ```
 
-##### <span id="head28"> 3.结果展示</span>
+##### <span id="head43"> 3.结果展示</span>
 
 <img src="note of opencv2python.assets/1.png" style="zoom:80%;" />
 

@@ -22,6 +22,18 @@ pip install pytesseract
 
 <img src="note of opencv2python.assets/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
 
+#### 常见图像坐标系
+
+Opencv：
+
+<img src="note of opencv2python.assets/coordinate.PNG" style="zoom:50%;" />
+
+Matlab：
+
+<img src="note of opencv2python.assets/coordinate2.PNG" style="zoom:50%;" />
+
+### 基本操作
+
 #### 将照片读入到矩阵中，并显示
 
 ```python
@@ -60,8 +72,6 @@ bgrimage = nparray.reshape([100, 400, 3]) #生成三通道数组
 src = np.random.randint(0, 255, 120000).reshape(300, 400)  #可随机生成numpy数组
 print(src)
 ```
-
-
 
 #### 窗口操作
 
@@ -106,7 +116,7 @@ elif k == ord('s'): # wait for 's' key to save and exit
 	cv2.destroyAllWindows()
 ```
 
-#### 视频与电脑摄像头输入
+#### 视频与电脑摄像头输入、存储
 
 ```python
 def video_demo(): #无输入值
@@ -325,6 +335,42 @@ cv.destroyAllWindows()
 
 opencv有限的事件处理能力与GUI处理能力，将其集成到其他应用程序框架更受欢迎
 
+#### 滑动条的实现
+
+```python
+import cv2
+import numpy as np
+
+
+def nothing(x):
+    pass
+# 创建一副黑色图像
+img=np.zeros((300,512,3),np.uint8)
+cv2.namedWindow('image')
+cv2.createTrackbar('R','image',0,255,nothing)
+cv2.createTrackbar('G','image',0,255,nothing)
+cv2.createTrackbar('B','image',0,255,nothing)
+switch='0:OFF\n1:ON'
+cv2.createTrackbar(switch,'image',0,1,nothing)
+while(1):
+    cv2.imshow('image',img)
+    k=cv2.waitKey(1)&0xFF
+    if k==27:
+        break
+    r=cv2.getTrackbarPos('R','image')
+    g=cv2.getTrackbarPos('G','image')
+    b=cv2.getTrackbarPos('B','image')
+    s=cv2.getTrackbarPos(switch,'image')
+    if s==0:
+        img[:]=0
+    else:
+        img[:]=[b,g,r]
+        #img = cv2.merge([b, g, r])
+cv2.destroyAllWindows()
+```
+
+### 核心操作
+
 ####  色彩空间转换
 
 ```python
@@ -333,6 +379,10 @@ dst = cv.bitwise_not(image) # 通过逻辑非运算来获得负片
 gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 back_rgb = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
 ```
+
+灰度：去除彩色信息将其转换成灰阶，对人脸检测等中间处理特别有效
+
+HSV：H（Hue）色调，S(Saturation)饱和度，V（Value）表示黑暗程度或光谱另一端的明亮程度，便于色彩区分 ，opencv中将hue值设为0-180，便于用uint8表示
 
 ####  Print函数Tips
 
@@ -489,6 +539,8 @@ src[50:250, 100:300] = backrgb
 cv.imshow("face", src)
 ```
 
+### 图像处理
+
 #### 泛洪填充
 
 ```python
@@ -517,9 +569,9 @@ def fill_binary():
 
 ##### 概述
 
-低通滤波：去除噪音，模糊图像，但去除了高频成分（噪声、边界）
+低通滤波：去噪，模糊图像，但去除了高频成分（噪声、边界）
 
-高通滤波：找到边缘
+高通滤波（图像梯度）：找到边缘
 
 空间滤波的数学原理:二维空间卷积
 
@@ -527,7 +579,7 @@ def fill_binary():
 
 平均：卷积框覆盖区域所有像素的平均值来代替中心元素
 
-高斯：方框中心的值最大，其余方框根据距离中心元素的距离递减，构成一个高斯小山包。原来的求平均数现在变成求加权平均数，权就是方框里的值，X与y方向的标准差相等，若设置为0，则函数根据核的大小自动计算
+高斯(低通滤波器之一）：方框中心的值最大，其余方框根据距离中心元素的距离递减，构成一个高斯小山包。原来的求平均数现在变成求加权平均数，权就是方框里的值，X与y方向的标准差相等，若设置为0，则函数根据核的大小自动计算
 
 ```python
 # 0是指根据窗口大小（5,5）来计算高斯函数标准差
@@ -536,7 +588,7 @@ blur = cv2.GaussianBlur(img,(5,5),0)
 
 只考虑像素之间的空间关系，而不会考虑像素值之间的关系（像素的相似度）
 
-中值：用与卷积框对应像素的中值来替代中心像素的值，去除椒盐噪声
+中值：用与卷积框对应像素的中值来替代中心像素的值，去除椒盐噪声、数字化的视频噪声尤其是彩色图像的噪声，但对于较大ksize，代价较高
 
 双边：保持边界清晰的情况下有效的去除噪音，使用空间高斯权重（位置差异越小权重越大）与灰度值相似性高斯权重（灰度值差异越小权重越大）,边缘处灰度值与中心像素灰度值相比变化大，权重小不会被模糊
 
@@ -545,7 +597,9 @@ blur = cv2.GaussianBlur(img,(5,5),0)
 blur = cv2.bilateralFilter(img,9,75,75)
 ```
 
-关于算子：元素个数为奇数，总和为0：进行边缘和梯度计算，总和为1进行增强锐化等
+关于算子：元素个数为奇数（奇数行奇数列），<u>总和为0</u>：进行边缘和梯度计算，
+
+<u>总和为1</u>：进行增强锐化等，相当于将感兴趣像素与其邻近像素值间的差放大，图像的亮度没有改变
 Tips：blurry模糊的，不清楚的，污脏的
 
 <img src="note of opencv2python.assets/1571712321721.png" alt="1571712321721" style="zoom:80%;" />
@@ -556,9 +610,234 @@ dst = cv.medianBlur(image, 5) #中值模糊
 def custom_blur_demo(image): #自定义卷积核来模糊
 	# kernel = np.ones([5, 5], np.float32)/25 #最多25个255，防止溢出
 	kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], np.float32)
-	dst = cv.filter2D(image, -1, kernel=kernel)
+	dst = cv.filter2D(image, -1, kernel=kernel) #-1表示目标图像与源图像的位深度相同
 	cv.imshow("custom_blur_demo" ,dst)
 ```
+
+filter2D()对每个通道使用相同的核，若要每个通道的核不同，则使用split分离通道，再用merge合并
+
+```python
+from scipy import ndimage
+
+
+kernel_3x3 = np.array([[-1, -1, -1],
+                   [-1,  8, -1],
+                   [-1, -1, -1]])
+k3 = ndimage.convolve(img, kernel_3x3) #通过numpy的ndimage的convolve可以实现两个矩阵之间的卷积
+```
+
+#### 图像梯度
+
+二维函数的梯度定义为向量,其幅度即模如下：
+$$
+\begin{array}{c}{\nabla \boldsymbol{f}=\left[\begin{array}{c}{g_{x}} \\ {g_{y}}\end{array}\right]=\left[\begin{array}{c}{\frac{\partial f}{\partial x}} \\ {\frac{\partial f}{\partial y}}\end{array}\right]} \\ {\nabla f=\operatorname{mag}(\nabla \boldsymbol{f})=\left[\begin{array}{c}{x_{x}^{2}+g_{y}^{2}}\end{array}\right]^{1 / 2}=\left[(\partial f / \partial x)^{2}+(\partial f / \partial y)^{2}\right]^{1 / 2}}\end{array}
+$$
+可由绝对值来近似：
+$$
+\nabla f \approx\left|g_{x}\right|+\left|g_{y}\right|
+$$
+
+离散化表示：
+$$
+\begin{aligned} g_{x} &=\frac{\partial f(x, y)}{\partial x}= f(x+1, y)-f(x, y) \\ g_{y} &=\frac{\partial f(x, y)}{\partial y}= f(x, y+1)-f(x, y) \end{aligned}
+$$
+
+##### Laplacian 算子
+
+可用来计算图像的二阶导数，推导在Matlab图像坐标系下进行：
+$$
+\begin{array}{c}{\nabla^{2} f(x, y)=\frac{\partial^{2} f(x, y)}{\partial x^{2}}+\frac{\partial^{2} f(x, y)}{\partial y^{2}}} \\ {\frac{\partial^{2} f(x, y)}{\partial x^{2}}=f(x+1, y)+f(x-1, y)-2 f(x, y)} \\ {\frac{\partial^{2} f(x, y)}{\partial y^{2}}=f(x, y+1)+f(x, y-1)-2 f(x, y)}  \\{\nabla^{2} f(x, y)=[f(x+1, y)+f(x-1, y)+f(x, y+1)+f(x, y-1)]-4 f(x, y)}\end{array}
+$$
+
+$$
+\begin{array}{ccc}{0} & {1} & {0} \\ {-1} & {-4} & {1} \\ {0} & {1} & {0} \\ \\ {1} & {1} & {1} \\ {1} & {-8} & {1} \\ {1} & {1} & {1}\end{array}
+$$
+
+第二个算子为考虑了对角线元素的效果
+
+```
+#cv2.CV_64F 输出图像的深度（数据类型），可以使用-1, 与原图像保持一致np.uint8
+laplacian=cv2.Laplacian(img,cv2.CV_64F)
+```
+
+##### Prewitt算子
+
+$$
+\begin{array}{l}{g_{x}=\frac{\partial f}{\partial x}=\left(z_{7}+z_{8}+z_{9}\right)-\left(z_{1}+z_{2}+z_{3}\right)} \\ {g_{y}=\frac{\partial f}{\partial y}=\left(z_{3}+z_{6}+z_{9}\right)-\left(z_{1}+z_{4}+z_{7}\right)}\end{array}
+$$
+
+对角线方向：
+$$
+\begin{array}{l}{g_{x}^{\prime}=\left(z_{2}+z_{3}+z_{6}\right)-\left(z_{4}+z_{7}+z_{8}\right)} \\ {g_{y}^{\prime}=\left(z_{6}+z_{8}+z_{9}\right)-\left(z_{1}+z_{2}+z_{4}\right)}\end{array}
+$$
+<img src="note of opencv2python.assets/prewitt.PNG" style="zoom:50%;" />
+
+##### Sobel算子和Scharr算子
+
+Sobel 算子是高斯平滑与微分操作的结合体，所以它的抗噪声能力很好。你可以设定求导的方向（xorder 或yorder）。还可以设定使用的卷积核的大小（ksize）。如果ksize=-1，会使用3x3 的Scharr 滤波器，它的的效果要比3x3 的Sobel 滤波器好（而且速度相同，所以在使用3x3 滤波器时应该尽量使用Scharr 滤波器）。3x3 的
+
+Sobel算子的卷积核：
+$$
+\begin{array}{l}{g_{x}=\frac{\partial f}{\partial x}=\left(z_{7}+2 z_{8}+z_{9}\right)-\left(z_{1}+2 z_{2}+z_{3}\right)} \\ {g_{y}=\frac{\partial f}{\partial y}=\left(z_{3}+2 z_{6}+z_{9}\right)-\left(z_{1}+2 z_{4}+z_{7}\right)}\end{array}
+$$
+<img src="note of opencv2python.assets/sobel.PNG" style="zoom:50%;" />
+
+Scharr 滤波器卷积核如下：
+
+X方向：
+$$
+\begin{array}{|c|c|c|}\hline-3 & {0} & {3} \\ \hline-10 & {0} & {10} \\ \hline-3 & {0} & {3} \\ \hline\end{array}
+$$
+Y方向：
+$$
+\begin{array}{|c|c|c|}\hline-3 & {-10} & {-3} \\ \hline 0 & {0} & {0} \\ \hline 3 & {10} & {3} \\ \hline\end{array}
+$$
+
+
+```python
+# 参数1,0 为只在x 方向求一阶导数，最大可以求2 阶导数。
+sobelx=cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+# 参数0,1 为只在y 方向求一阶导数，最大可以求2 阶导数。
+sobely=cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
+```
+
+当我们可以通过参数 -1 来设定输出图像的深度（数据类型）与原图像保持一致，但是我们在代码中使用的却是 cv2.CV_64F。这是为什么呢？想象一下一个从黑到白的边界的导数是正数，而一个从白到黑的边界点导数却是负数。如果原图像的深度是np.int8 时，所有的负值都会被截断变成 0，换句话说就是把把边界丢失掉。所以如果这两种边界你都想检测到，最好的的办法就是将输出的数据类型设置的更高，比如 cv2.CV_16S，cv2.CV_64F 等。取绝对值然后再把它转回到 cv2.CV_8U
+
+```python
+# Output dtype = cv2.CV_8U
+sobelx8u = cv2.Sobel(img,cv2.CV_8U,1,0,ksize=5)# 也可以将参数设为-1
+#sobelx8u = cv2.Sobel(img,-1,1,0,ksize=5)
+# Output dtype = cv2.CV_64F. Then take its absolute and convert to cv2.CV_8U
+sobelx64f = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+abs_sobel64f = np.absolute(sobelx64f)
+sobel_8u = np.uint8(abs_sobel64f)
+```
+
+#### 边缘检测
+
+Laplacian(),sobel,scharr等会将噪声错误地识别为边缘，故在此之前应进行中值滤波和灰度化
+
+核的元素值之和为0，将边缘转为白色，非边缘转为黑色
+
+##### Canny边缘检测
+
+John F.Canny 在1986 年提出的，分为以下五步：
+
+1. 使用高斯滤波器去噪
+
+2. 使用Sobel算子计算水平方向和垂直方向梯度，找到边界的梯度和方向
+   $$
+   \begin{array}{c}{\text { Edge-Gradient }(G)=\sqrt{G_{x}^{2}+G_{y}^{2}}} \\ {\text { Angle }(\theta)=\tan ^{-1}\left(\frac{G_{x}}{G_{y}}\right)}\end{array}
+   $$
+
+   梯度的方向一般总是与边界垂直。梯度方向被归为四类：垂直，水平，和两个对角线
+
+3.在边缘上使用非最大抑制（NMS）
+
+在获得梯度的方向和大小之后，应该对整幅图像做一个扫描，去除那些非边界上的点。对每一个像素进行检查，看这个点的梯度是不是周围具有相同梯度方向的点中最大的。
+
+4.检测到的边缘上使用双阈值去除假阳性：
+
+当图像的灰度梯度高于maxVal 时被认为是真的边界，那些低于minVal 的边界会被抛弃。如果介于两者之间的话，就要看这个点是否与某个被确定为真正的边界点相连，如果是就认为它也是边界点，如果不是就抛弃
+
+<img src="note of opencv2python.assets/double_threshold.PNG" style="zoom:50%;" />
+
+5.分析所有边缘及其间的连接，保留真正的边缘，消除不明显的边缘
+
+函数实现:cv2.Canny()
+
+第一个参数是输入图像。第二和第三个分别是minVal 和maxVal。第三个参数设置用来计算图像梯度的Sobel
+卷积核的大小，默认值为3。最后一个参数是L2gradient，它可以用来设定求梯度大小的方程。若为True，平方和开根号，若为False，用绝对值之和来近似，默认为False。
+
+```python
+img=cv2.Canny(img, 50, 150, apertureSize=3, L2gradient=True)
+```
+
+用滑动条观看阈值对检测效果的影响：
+
+```python
+# something wrong
+def nothing(x):
+     pass
+
+img = cv2.imread("../images/statue_small.jpg", 1)
+
+cv2.namedWindow('canny')
+cv2.createTrackbar('minval','canny',0,255, nothing)
+cv2.createTrackbar('maxval','canny',0,255, nothing)
+while(1):
+    minval = cv2.getTrackbarPos('minval','canny')
+    maxval = cv2.getTrackbarPos('maxval','canny')
+    canny = cv2.Canny(img, minval, maxval)
+    cv2.imshow("image", img)
+    cv2.imshow("canny", canny)
+    k = cv2.waitKey(0)
+    if k == 27:
+        break
+cv2.destroyAllWindows()
+```
+
+#### 轮廓检测
+
+
+
+#### 图像阈值
+
+##### 简单阈值
+
+cv2.threshhold()：
+
+- 第一个参数就是原图像，原图像应该是灰度图
+
+- 第二个参数就是用来对像素值进行分类的阈值
+
+- 第三个参数就是当像素值高于（有时是小于）阈值时应该被赋予的新的像素值
+
+- 第四个参数表示阈值方法
+
+  cv2.THRESH_BINARY：
+  $$
+  \operatorname{dst}(x, y)=\left\{\begin{array}{c}{\text { maxval } i f \operatorname{src}(x, y)>\text { thresh }} \\ {0 \text { otherwise }}\end{array}\right.
+  $$
+  cv2.THRESH_BINARY_INV：
+  $$
+  \operatorname{dst}(x, y)=\left\{\begin{array}{c}{0 \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {\text { maxval otherwise }}\end{array}\right.
+  $$
+  cv2.THRESH_TRUNC：
+  $$
+  \operatorname{dst}(x, y)=\left\{\begin{array}{c}{\text { threshold } i f \operatorname{src}(x, y)>\text { thresh }} \\ {\operatorname{src}(x, y) \text { otherwise }}\end{array}\right.
+  $$
+  cv2.THRESH_TOZERO：
+  $$
+  \operatorname{dst}(x, y)=\left\{\begin{array}{c}{\operatorname{src}(x, y) \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {0 \text { otherwise }}\end{array}\right.
+  $$
+  cv2.THRESH_TOZERO_INV：
+  $$
+  \operatorname{dst}(x, y)=\left\{\begin{array}{c}{0 \text { if } \operatorname{src}(x, y)>\text { thresh }} \\ {\operatorname{src}(x, y) \text { otherwise }}\end{array}\right.
+  $$
+
+例如：
+
+```python
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+img=cv2.imread('gradient.png',0)
+ret,thresh1=cv2.threshold(img,127,255,cv2.THRESH_BINARY)
+ret,thresh2=cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+ret,thresh3=cv2.threshold(img,127,255,cv2.THRESH_TRUNC)
+ret,thresh4=cv2.threshold(img,127,255,cv2.THRESH_TOZERO)
+ret,thresh5=cv2.threshold(img,127,255,cv2.THRESH_TOZERO_INV)
+titles = ['Original Image','BINARY','BINARY_INV','TRUNC','TOZERO','TOZERO_INV']
+images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
+for i in xrange(6):
+	plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+	plt.title(titles[i])
+	plt.xticks([]),plt.yticks([])
+plt.show()
+```
+
+
 
 #### 使用git, Typora，github创建笔记
 
