@@ -1,12 +1,14 @@
-[TOC]
-
-
-
-
-
-
-
-
+---
+title: Note of Opencv2Python
+date: 2019-11-10
+tags: 
+- opencv
+- python
+- cv
+categories:
+- opencv2python
+mathjax: true
+---
 
 ### Note of Opencv to Python
 
@@ -20,17 +22,17 @@ pip install pytesseract
 
 新建python项目，注意解释器正确配置应该如下：
 
-<img src="note of opencv2python.assets/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
+<img src="note of opencv2python/1571710989690.png" alt="1571710989690" style="zoom:80%;" />
 
 #### 常见图像坐标系
 
 Opencv：
 
-<img src="note of opencv2python.assets/coordinate.PNG" style="zoom:50%;" />
+<img src="note of opencv2python/coordinate.PNG" style="zoom:50%;" />
 
 Matlab：
 
-<img src="note of opencv2python.assets/coordinate2.PNG" style="zoom:50%;" />
+<img src="note of opencv2python/coordinate2.PNG" style="zoom:50%;" />
 
 ### 基本操作
 
@@ -99,9 +101,9 @@ cv.startWindowThread()
 
 <u>ASCII码值</u>：0~127，共128个
 
-<img src="note of opencv2python.assets/asciifull.png" style="zoom:150%;" />
+<img src="note of opencv2python/asciifull.png" style="zoom:150%;" />
 
-<img src="note of opencv2python.assets/extend_ascii.png" style="zoom:150%;" />
+<img src="note of opencv2python/extend_ascii.png" style="zoom:150%;" />
 
 <u>设置参数</u>：使用waitKey(0) （无限等待）来判断相应按键操作，若为64位电脑，则需设置为k=cv2.waitKey(0)&0xFF。
 
@@ -258,13 +260,13 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 cv2.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2,cv2.LINE_AA) #位置，字体类型，字体大小，颜色，粗细，线条的类型
 ```
 
-<img src="note of opencv2python.assets/ellipse.png" style="zoom:150%;" />
+<img src="note of opencv2python/ellipse.png" style="zoom:150%;" />
 
 #### 鼠标操作响应
 
 事件列表：
 
-<img src="note of opencv2python.assets/event.png" style="zoom:80%;" />
+<img src="note of opencv2python/event.png" style="zoom:80%;" />
 
 ```python
 # mouse callback function
@@ -444,7 +446,7 @@ array生成任意矩阵，可以作为算子
 m3 = np.array([[1,2,3], [4,5,6], [7,8,9]],np.int32)
 ```
 
-<img src="note of opencv2python.assets/1571711690470-1571720785213.png" alt="1571711690470" style="zoom:150%;" />
+<img src="note of opencv2python/1571711690470-1571720785213.png" alt="1571711690470" style="zoom:150%;" />
 
 
 
@@ -464,7 +466,7 @@ print("time = %s ms" % (time * 1000))
 
 思路：转换到HSV空间，再参考下表设置inRange函数的参数(红色设置为第二列较佳)
 
-<img src="note of opencv2python.assets/1571711906767.png" alt="1571711906767" style="zoom:150%;" />
+<img src="note of opencv2python/1571711906767.png" alt="1571711906767" style="zoom:150%;" />
 
 ```python
 def extract_object_demo():
@@ -516,7 +518,7 @@ dst2 = cv.bitwise_and(m1, m2) # 可以作为一个“遮罩”
 dst3 = cv.bitwise_not(m1) #获得负片
 ```
 
-<img src="note of opencv2python.assets/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
+<img src="note of opencv2python/1571712052313.png" alt="1571712052313" style="zoom:80%;" />
 
 ####  调整对比度和亮度
 
@@ -552,7 +554,7 @@ def fill_color_demo(image):
 	cv.imshow("fill_color_demo", copyImg)
 ```
 
-<img src="note of opencv2python.assets/1571712200414.png" alt="1571712200414" style="zoom:80%;" />
+<img src="note of opencv2python/1571712200414.png" alt="1571712200414" style="zoom:80%;" />
 
 ```python
 def fill_binary():
@@ -602,7 +604,7 @@ blur = cv2.bilateralFilter(img,9,75,75)
 <u>总和为1</u>：进行增强锐化等，相当于将感兴趣像素与其邻近像素值间的差放大，图像的亮度没有改变
 Tips：blurry模糊的，不清楚的，污脏的
 
-<img src="note of opencv2python.assets/1571712321721.png" alt="1571712321721" style="zoom:80%;" />
+<img src="note of opencv2python/1571712321721.png" alt="1571712321721" style="zoom:80%;" />
 
 ```python
 dst = cv.blur(image, (1, 15)) #均值模糊，模糊只是卷积的表象
@@ -670,7 +672,7 @@ $$
 $$
 \begin{array}{l}{g_{x}^{\prime}=\left(z_{2}+z_{3}+z_{6}\right)-\left(z_{4}+z_{7}+z_{8}\right)} \\ {g_{y}^{\prime}=\left(z_{6}+z_{8}+z_{9}\right)-\left(z_{1}+z_{2}+z_{4}\right)}\end{array}
 $$
-<img src="note of opencv2python.assets/prewitt.PNG" style="zoom:50%;" />
+<img src="note of opencv2python/prewitt.PNG" style="zoom:50%;" />
 
 ##### Sobel算子和Scharr算子
 
@@ -680,7 +682,7 @@ Sobel算子的卷积核：
 $$
 \begin{array}{l}{g_{x}=\frac{\partial f}{\partial x}=\left(z_{7}+2 z_{8}+z_{9}\right)-\left(z_{1}+2 z_{2}+z_{3}\right)} \\ {g_{y}=\frac{\partial f}{\partial y}=\left(z_{3}+2 z_{6}+z_{9}\right)-\left(z_{1}+2 z_{4}+z_{7}\right)}\end{array}
 $$
-<img src="note of opencv2python.assets/sobel.PNG" style="zoom:50%;" />
+<img src="note of opencv2python/sobel.PNG" style="zoom:50%;" />
 
 Scharr 滤波器卷积核如下：
 
@@ -740,7 +742,7 @@ John F.Canny 在1986 年提出的，分为以下五步：
 
 当图像的灰度梯度高于maxVal 时被认为是真的边界，那些低于minVal 的边界会被抛弃。如果介于两者之间的话，就要看这个点是否与某个被确定为真正的边界点相连，如果是就认为它也是边界点，如果不是就抛弃
 
-<img src="note of opencv2python.assets/double_threshold.PNG" style="zoom:50%;" />
+<img src="note of opencv2python/double_threshold.PNG" style="zoom:50%;" />
 
 5.分析所有边缘及其间的连接，保留真正的边缘，消除不明显的边缘
 
@@ -779,7 +781,272 @@ cv2.destroyAllWindows()
 
 #### 轮廓检测
 
+轮廓可以简单认为成将连续的点（连着边界）连在一起的曲线，具有相同的**颜色或者灰度**。轮廓在形状分析和物体的检测和识别中很有用。注意：
 
+1. 为更加准确，寻找轮廓前，进行阈值化或canny边缘检测
+2. `cv2.findContours()`会修改原始图像，若后续想使用原始图像，应使用`copyImg = image.copy()`
+3. 查找轮廓是在黑色背景中找白色物体
+
+##### 应用
+
+计算多边形边界、形状逼近、计算感兴趣区域
+
+在opencv4中`cv2.findContours`**输入**：第一个是输入图像，第二个是轮廓检索模式，第三个是轮廓近似方法，`cv2.CHAIN_APPROX_NONE`所有边界点均被存储，`cv2.CHAIN_APPROX_SIMPLE`去掉轮廓上的冗余点。压缩轮廓，减少内存开支
+
+**返回**：只返回轮廓（python列表，每个元素为一个numpy数组）、轮廓的层析结构、不返回图像
+
+##### 轮廓的绘制
+
+`cv2.drawContours()`输入：原始图像、轮廓、轮廓的索引（设置为-1时绘制所有轮廓、轮廓的颜色、轮廓的厚度，输出：图像
+
+```python
+#bugs:不能读取jpg、JPEG文件，文件路径采用/不要用\
+import numpy as np
+import cv2.cv2
+im = cv2.imread('D:/opencv_imagedata/data/shape_binary.png')
+imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+ret,thresh = cv2.threshold(imgray,127,255,0)
+contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+img1 = cv2.drawContours(im, contours, -1, (255,0,0), 3)
+img2 = cv2.drawContours(im, contours, 3, (0,255,0), 3)
+cv2.imshow("img2",img2)
+cv2.waitKey()
+cv2.destroyAllWindows()
+```
+
+##### 轮廓特征
+
+###### 矩
+
+```
+cnt = contours[0]
+M = cv2.moments(cnt)
+print(M)
+cx = int(M['m10']/M['m00'])
+cy = int(M['m01']/M['m00'])
+```
+
+根据这些矩的值，我们可以计算出对象的重心:
+$$
+C_{x}=\frac{M_{10}}{M_{00}}, \quad C_{y}=\frac{M_{01}}{M_{00}}
+$$
+
+###### 轮廓面积
+
+```
+area = M['m00']
+area = cv2.contourArea(cnt)
+```
+
+###### 轮廓周长
+
+```
+perimeter = cv2.arcLength(cnt,True)
+```
+
+###### 轮廓近似
+
+```python
+epsilon = 0.1*cv2.arcLength(cnt,True)
+approx = cv2.approxPolyDP(cnt,epsilon,True)
+img3 = cv2.drawContours(im, approx, 0, (0, 255, 0), 3)
+```
+
+`cv2.approxPolyDP`输入：轮廓、原轮廓与近似多边形周长的最大差值，输出与输入曲线类型相同的曲线
+
+###### 凸包
+
+与轮廓近似相似凸性缺陷：一般来说，凸性曲线总是凸出来的，至少是平的。如果有地方凹进去了就被叫做凸性缺陷
+
+```
+hull = cv2.convexHull(points[, hull[, clockwise[, returnPoints]]
+```
+
+输入：
+
+```
+points 我们要传入的轮廓
+hull 输出，通常不需要
+clockwise 方向标志。如果设置为True，输出的凸包是顺时针方向的。
+否则为逆时针方向。
+returnPoints 默认值为True。它会返回凸包上点的坐标。如果设置
+为False，就会返回与凸包点对应的轮廓上的点。
+```
+
+```
+hull = cv2.convexHull(cnt)
+```
+
+如`returnPoints`设置为`true`返回`[[[234 202]], [[ 51 202]], [[ 51 79]], [[234 79]]]`;设置为`False`返回`[[129],[ 67],[ 0],[142]]`,可认为是`cnt`这个列表的索引
+
+###### 凸性检测
+
+```python
+k = cv2.isContourConvex(cnt)
+```
+
+返回一个布尔值
+
+###### 边界矩形
+
+**直边界矩形**：没有旋转的矩形，矩形面积非最小
+
+```
+x,y,w,h = cv2.boundingRect(cnt)
+img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+```
+
+**旋转的边界矩形**
+
+考虑了对象的旋转，矩形面积最小，`cv2.minAreaRect()`返回的是一个Box2D 结构，其中包含矩形左上角角点的坐标（x，y），矩形的宽和高（w，h），以及旋转角度。
+
+```
+for c in contours:
+  # find bounding box coordinates
+  x,y,w,h = cv2.boundingRect(cnt)
+  cv2.rectangle(img, (x,y), (x+w, y+h), (0, 255, 0), 2)
+  # find minimum area
+  rect = cv2.minAreaRect(cnt)
+  # calculate coordinates of the minimum area rectangle
+  box = cv2.boxPoints(rect)
+  # normalize coordinates to integers
+  box = np.int0(box)
+  # draw contours
+  cv2.drawContours(img, [box], 0, (0,0, 255), 3)
+```
+
+###### 最小闭圆（最小外接圆）
+
+找到一个轮廓的外切圆
+
+```python
+(x,y),radius = cv2.minEnclosingCircle(cnt)
+center = (int(x),int(y))
+radius = int(radius)
+img = cv2.circle(img,center,radius,(0,255,0),2)
+```
+
+###### 椭圆拟合
+
+返回旋转边界矩形的内切椭圆
+
+```
+ellipse = cv2.fitEllipse(cnt)
+img = cv2.ellipse(im,ellipse,(0,255,0),2)
+```
+
+###### 直线拟合
+
+根据轮廓上的点来拟合一条直线
+
+```python
+[vx,vy,x,y] = cv2.fitLine(cnt, cv2.DIST_L2,0,0.01,0.01)
+rows, cols = im.shape[:2]
+lefty = int((-x*vy/vx) + y)
+righty = int(((cols-x)*vy/vx)+y)
+img4 = cv2.line(im,(cols-1,righty),(0,lefty),(0,255,0),2)
+```
+
+##### 轮廓的性质
+
+```python
+#长宽比：边界矩形的宽高比
+x,y,w,h = cv2.boundingRect(cnt)
+aspect_ratio = float(w)/h
+#Extent：轮廓面积与边界矩形面积的比
+area = cv2.contourArea(cnt)
+rect_area = w*h
+extent = float(area)/rect_area
+#Solidity：轮廓面积与凸包面积的比
+hull = cv2.convexHull(cnt)
+hull_area = cv2.contourArea(hull)
+solidity = float(area)/hull_area
+#Equivalent Diameter（当量直径）：与轮廓面积相等的圆形的直径
+equi_diameter = np.sqrt(4*area/np.pi)
+#方向：对象的方向，下面的方法还会返回长轴和短轴的长度
+(x,y),(MA,ma),angle = cv2.fitEllipse(cnt)
+#获取以轮廓包围区域为掩模的方法1：
+mask = np.zeros(imgray.shape,np.uint8)
+cv2.drawContours(mask,[cnt],0,255,-1) # 这里一定要使用参数-1, 绘制填充的的轮廓
+pixelpoints = np.transpose(np.nonzero(mask)) #找到非零元素的坐标再取对角
+pixelpoints = cv2.findNonZero(mask)
+#原图像中轮廓对应的区域像素极值及其位置，以mask作为一个掩模
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(im,mask = mask)
+#平均颜色
+mean_color = cv2.mean(im,mask = mask)
+#平均灰度
+mean_graylevel = cv2.mean(im,mask = mask)
+#获取轮廓的极点
+leftmost = tuple(cnt[cnt[:,:,0].argmin()][0])
+rightmost = tuple(cnt[cnt[:,:,0].argmax()][0])
+topmost = tuple(cnt[cnt[:,:,1].argmin()][0])
+bottommost = tuple(cnt[cnt[:,:,1].argmax()][0])
+```
+
+##### 凸缺陷
+
+`cv2.convexityDefects`返回每个凸缺陷的[起点，终点，最远的点，到最
+远点的近似距离]，注意前三个值均为轮廓点的索引
+
+```python
+import cv2
+import numpy as np
+img = cv2.imread('star.jpg')
+img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(img_gray, 127, 255,0)
+contours,hierarchy = cv2.findContours(thresh,2,1)
+cnt = contours[0]
+hull = cv2.convexHull(cnt,returnPoints = False)
+defects = cv2.convexityDefects(cnt,hull)
+#为何要这样索引？
+for i in range(defects.shape[0]):
+	s,e,f,d = defects[i,0]
+	start = tuple(cnt[s][0])
+	end = tuple(cnt[e][0])
+	far = tuple(cnt[f][0])
+	cv2.line(img,start,end,[0,255,0],2)
+	cv2.circle(img,far,5,[0,0,255],-1)
+cv2.imshow('img',img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+![image-20191123134441066](note of opencv2python/star_convex.png)
+
+##### 点与轮廓间的距离
+
+求解图像中的一个点到一个对象轮廓的最短距离。如果点在轮廓的外部，返回值为负。如果在轮廓上，返回值为0。如果在轮廓内部，返回值为正。
+
+第三个参数是measureDist。如果设置为True，就会计算最短距离。如果是False，只会判断这个点与轮廓之间的位置关系（返回值为+1，-1，0）
+
+```
+dist = cv2.pointPolygonTest(cnt,(50,50),True)
+```
+
+##### 形状匹配
+
+`cv2.matchShape()`比较两个形状或轮廓的相似度，返回值越小匹配越好
+
+原理：Hu矩：Hu 矩是归一化中心矩的线性组合，之所以这样做是为了能够获取代表图像的某个特征的矩函数，这些矩函数对某些变化如缩放，旋转，镜像映射（除了h1）具有不变形
+
+```python
+ret = cv2.matchShapes(cnt1,cnt2,1,0.0)
+```
+
+##### 轮廓的层次结构
+
+一个形状在另外一个形状的内部，外部的形状为父，内部的形状为子
+
+###### opencv中的层次结构
+
+使用一个数组表示：`[Next，Previous，First_Child，Parent]`，分别表示同级下一个轮廓、同级前一个轮廓、第一个子轮廓、父轮廓，没有时为-1，顺序：从上到下，从左到右
+
+###### 轮廓检索方式
+
+1. `RETR_LIST`,只是提取所有的轮廓，而不去创建任何父子关系,所有轮廓在同一级别
+2. `RETR_EXTERNAL`,只会返回最外边的的轮廓，所有的子轮廓都会被忽略掉
+3. `RETR_CCOMP`返回所有轮廓，分为两极组织结构，一副黑底白字的图像，图像中是数字0。0 的外边界属于第一级组织结构，0 的内部属于第2 级组织结构
+4. `RETR_TREE`返回所有轮廓，创建完整的组织结构列表
 
 #### 图像阈值
 
@@ -996,8 +1263,8 @@ end
 
 ##### 3.结果展示
 
-<img src="note of opencv2python.assets/1.png" style="zoom:80%;" />
+<img src="note of opencv2python/1.png" style="zoom:80%;" />
 
-<img src="note of opencv2python.assets/3.png" style="zoom:80%;" />
+<img src="note of opencv2python/3.png" style="zoom:80%;" />
 
-<img src="note of opencv2python.assets/5.png" style="zoom:80%;" />
+<img src="note of opencv2python/5.png" style="zoom:80%;" />

@@ -1,3 +1,16 @@
+---
+title: Note of ROS to Ubantu
+date: 2019-11-10
+tags: 
+- ROS
+- Ubantu
+categories:
+- ROS
+- Ubantu
+---
+
+
+
 ### Note of ROS to Ubantu
 
 #### terminal命令
