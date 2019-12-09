@@ -38,5 +38,20 @@ row 行
 colunm 列
 extremum 极值
 gray level 灰度
+entropy 熵
+stochastic 随机的，猜测的
+crop 修剪，种植
+shuffle 随机播放，打乱顺序
+transpose 调换，转置
+precisely 恰好地
+dilation 扩张
+co-adaptation 过拟合
+syllabus 教学摘要，课程表
+spatial 空间的
+stochastic 随机的
+bottleneck 瓶颈
+geometry 几何结构
+plain 平的，简单的，朴素的
+Fine-tune 微调
 ```
 

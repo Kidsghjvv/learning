@@ -139,3 +139,77 @@ dict_values(['Tang', 7272, 'changsha'])
 #### tuple
 
 构造一个元组
+
+## 面向对象的方法-类
+
+类是用来描述具有相同属性和方法的对象的集合，定义了该集合中每个对象的共有属性和方法，对象是类的实例
+
+### 类的创建、继承与重写
+
+```python
+class People:
+    
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        
+    def dis_name(self):
+        print("name is:",self.name)
+
+    def set_age(self, age):
+        self.age = age
+        
+    def dis_age(self):
+        print("age is:",self.age)
+        
+class Student(People): #继承父类
+    def __init__(self, name, age, school_name):
+        self.name = name
+        self.age = age
+        self.school_name = school_name
+
+    def dis_student(self):
+        print("school name is:",self.school_name)
+    
+    def dis_name(self): #子类中对父类进行重写
+        print("名字：",self.name)
+        
+student = Student("Wu", "20", "GLDZ") #创建一个Student 对象
+student.dis_student() #调用子类的方法
+student.dis_name() #调用子类的方法，已重写
+student.dis_age() #调用父类的方法
+student.set_age(22) #调用父类的方法
+student.dis_age() #调用父类的方法
+```
+
+`next()`返回迭代器的下一个值
+
+`iter()`生成迭代器
+
+## Matplotlib
+
+### 画函数图像
+
+```python
+import matplotlib.pyplot as plt
+import numpy as nps
+%matplotlib inline
+x = np.arange(-10,10,0.01)
+# y = (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
+y = np.where(x<0,0,x)
+# y = np.sin(x)
+plt.plot(x, y)
+plt.title("ReLU",fontsize = 10)
+# plt.xlabel("horizontal axis", fontsize = 10)
+# plt.ylabel("vertical axis",fontsize = 10)
+plt.tick_params(axis="both", labelsize = 10)
+ax = plt.gca()                                            # get current axis 获得坐标轴对象
+ax.spines['right'].set_color('none') 
+ax.spines['top'].set_color('none')         # 将右边 上边的两条边颜色设置为空 其实就相当于抹掉这两条边
+ax.xaxis.set_ticks_position('bottom')   
+ax.yaxis.set_ticks_position('left')          # 指定下边的边作为 x 轴   指定左边的边为 y 轴
+ax.spines['bottom'].set_position(('data', 0))   #指定 data  设置的bottom(也就是指定的x轴)绑定到y轴的0这个点上
+ax.spines['left'].set_position(('data', 0))
+plt.show()
+```
+
